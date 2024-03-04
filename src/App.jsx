@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { SwapiService } from './service/swapiService';
 import Main from './components/Main/Main';
+import LoadingDate from './components/LoadingDate/LoadingDate';
 
 const App = () => {
   const [state, setState] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const swapi = new SwapiService();
 
   useEffect(() => {
-    swapi.getMovies().then(({results}) => {
+    swapi.getMovies().then(({ results }) => {
       return results.map(movie => {
         setState(state => {
           return [
@@ -25,13 +27,13 @@ const App = () => {
         });
       });
     });
+    setLoading(false);
   }, []);
 
-  return (
-    <>
-      <Main state={state} />
-    </>
-  );
+  if (loading) {
+    return <LoadingDate />;
+  }
+  return <Main state={state} />;
 };
 
 export default App;
