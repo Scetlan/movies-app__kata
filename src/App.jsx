@@ -6,8 +6,14 @@ import LoadingDate from './components/LoadingDate/LoadingDate';
 const App = () => {
   const [state, setState] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [errorDate, setErrorDate] = useState(false);
 
   const swapi = new SwapiService();
+
+  const onError = (error) => {
+    setErrorDate(true);
+    setLoading(false);
+  }
 
   useEffect(() => {
     swapi.getMovies().then(({ results }) => {
@@ -26,14 +32,22 @@ const App = () => {
           ];
         });
       });
-    });
+    })
+    .catch(onError);
     setLoading(false);
   }, []);
 
-  if (loading) {
-    return <LoadingDate />;
-  }
-  return <Main state={state} />;
+
+  const errorMessage = errorDate ? <ErrorIndicator /> : null;
+  const spiner = loading ? <LoadingDate /> : null;
+  const content = !(loading || errorDate) ? <Main state={state} /> : null;
+
+  return (
+    <>
+    {spiner}
+    {content}
+    </>
+  );
 };
 
 export default App;
