@@ -1,7 +1,7 @@
 import React from "react";
 
 const Card = ({ title, releaseDate, overview, img, id }) => {
-  console.log(`AAAAA:${img}`);
+
   return (
     <li className={`content__list-item ${id}`}>
       <img className="pic" src={img} alt={`${title}`} />
