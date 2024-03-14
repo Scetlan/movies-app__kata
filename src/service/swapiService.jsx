@@ -19,4 +19,8 @@ export class SwapiService {
   async getMovies() {
     return await this.getResource(`/3/discover/movie?api_key=8655a10ea10b24c26b719cefdce2c44c`);
   }
+
+  async searchMoviesByTitle(title, page) {
+    return await this.getResource(`/3/search/movie?api_key=8655a10ea10b24c26b719cefdce2c44c&query=${title}&page=${page}`);
+  }
 }

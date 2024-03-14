@@ -1,45 +1,70 @@
 import React, { useEffect, useState } from 'react';
 import { SwapiService } from './service/swapiService';
-import Main from './components/Main/Main';
+import ListMovies from './components/Content/ListMovies';
 import { Spin } from 'antd';
 
+import _ from 'lodash';
+import Header from './components/Header/Header';
+
 const App = () => {
-  const [state, setState] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [movies, setMovies] = useState([]);
+  const [numPage, setNumPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalResults, setTotalResults] = useState(0);
 
   const swapi = new SwapiService();
 
   useEffect(() => {
-    swapi
-      .getMovies()
-      .then(({ results }) => {
-        return results.map(movie => {
-          setState(state => {
-            return [
-              ...state,
-              {
-                id: movie.id,
-                overview: movie.overview,
-                title: movie.title,
-                backdrop_path: `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`,
-                release_date: movie.release_date,
-                genre_ids: movie.genre_ids,
-              },
-            ];
-          });
-        });
-      })
-    setLoading(false);
-  }, []);
+    const fetchMovies = async () => {
+      setLoading(true);
+      if (searchQuery) {
+        const { results, total_pages, total_results, page } = await swapi.searchMoviesByTitle(searchQuery, numPage);
+        setTotalPages(total_pages);
+        setTotalResults(total_results);
+        if (page === numPage) {
+          setMovies([]);
+          const updatedResults = results.map(movie => ({
+            ...movie,
+            backdrop_path: movie.backdrop_path === null ? '' : `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`,
+          }));
+          setMovies(updatedResults);
+        }
+      } else {
+        setLoading(false);
+        setMovies([]);
+      }
+      setLoading(false);
+    };
 
-  const spiner = !loading ? <Spin tip="Loading" size="large" /> : null;
-  const content = !loading ? <Main state={state} /> : null;
+    const debouncedFetch = _.debounce(fetchMovies, 500);
+    debouncedFetch();
+
+    return () => debouncedFetch.cancel();
+  }, [searchQuery]);
+
+  const handleSearch = value => {
+    setLoading(true);
+    setSearchQuery(value);
+  };
+
+  const handlePageChange = async page => {
+    setNumPage(page);
+  };
+
+  const spiner = loading ? (
+    <Spin className="spiner" tip="Loading" size="large" />
+  ) : (
+    <ListMovies movies={movies} totalPages={totalPages} total={totalResults} handlePageChange={handlePageChange} />
+  );
+  const content = !loading && movies.length === 0 ? <div>No results found</div> : spiner;
 
   return (
-    <>
-      {spiner}
+    <main className="content">
+      <Header onSearch={handleSearch} />
       {content}
-    </>
+    </main>
   );
 };
 
