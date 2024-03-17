@@ -4,6 +4,7 @@ import ListMovies from './components/Content/ListMovies';
 import { Spin } from 'antd';
 import Header from './components/Header/Header';
 import { debounce } from 'lodash';
+import Alert from 'antd/es/alert/Alert';
 
 const App = () => {
   const [movies, setMovies] = useState([]);
@@ -62,7 +63,7 @@ const App = () => {
   ) : (
     <ListMovies movies={movies} totalPages={movies.length} total={totalResults} handlePageChange={handlePageChange} current={current}/>
   );
-  const content = !loading && movies.length === 0 ? <div>No results found</div> : spiner;
+  const content = !loading && movies.length === 0 ? <Alert className='alert-error' message="No results found" type="success" /> : spiner;
 
   return (
     <main className="content">

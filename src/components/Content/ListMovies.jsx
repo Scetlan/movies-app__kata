@@ -3,7 +3,6 @@ import Card from './ListCard/Card';
 import { Pagination } from 'antd';
 
 const ListMovies = ({ movies, total, totalPages, handlePageChange, current }) => {
-  console.log(total);
   return (
     <>
       <ul className="content__list">
