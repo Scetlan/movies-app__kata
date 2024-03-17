@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { SwapiService } from './service/swapiService';
 import ListMovies from './components/Content/ListMovies';
 import { Spin } from 'antd';
-
-import _ from 'lodash';
 import Header from './components/Header/Header';
+import { debounce } from 'lodash';
 
 const App = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [current, setCurrent] = useState();
   const [searchQuery, setSearchQuery] = useState('');
   const [totalPages, setTotalPages] = useState(0);
   const [totalResults, setTotalResults] = useState(0);
@@ -34,22 +34,21 @@ const App = () => {
       setLoading(false);
     };
 
-    const debouncedFetch = _.debounce(fetchMovies, 500);
+    const debouncedFetch = debounce(fetchMovies, 1000);
     debouncedFetch();
 
     return () => debouncedFetch.cancel();
   }, [searchQuery]);
 
-  const handleSearch = value => {
+  const handleSearch = event => {
     setLoading(true);
-    setSearchQuery(value);
+    setSearchQuery(event.target.value);
   };
 
   const handlePageChange = async (page) => {
     setLoading(true);
     const { results } = await swapi.searchMoviesByTitle(searchQuery, page);
-    console.log(page);
-
+    setCurrent(page);
     const updatedResults = results.map(movie => ({
       ...movie,
       backdrop_path: movie.backdrop_path === null ? '' : `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`,
@@ -61,7 +60,7 @@ const App = () => {
   const spiner = loading ? (
     <Spin className="spiner" tip="Loading" size="large" />
   ) : (
-    <ListMovies movies={movies} totalPages={totalPages} total={totalResults} handlePageChange={handlePageChange} />
+    <ListMovies movies={movies} totalPages={movies.length} total={totalResults} handlePageChange={handlePageChange} current={current}/>
   );
   const content = !loading && movies.length === 0 ? <div>No results found</div> : spiner;
 

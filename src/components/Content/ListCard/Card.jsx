@@ -1,14 +1,16 @@
 import React from 'react';
+import photo from './img/noPhoto.jpg'; 
 
 const Card = ({ title, releaseDate, overview, img }) => {
   const isImg = img === '';
   return (
     <li className={`content__list-item`}>
-      {isImg ? <div className='pic'>No Photo</div> : <img className="pic" src={img} alt={`${title}`}/>}
+      <img className="pic" src={isImg ? photo : img} alt={`${title}`}/>
       <div className="description">
         <h2 className="title">{title}</h2>
         <p className="date">{releaseDate}</p>
-        <p className="plot">{overview}</p>
+        <p className="genre"></p>
+        <p className="plot-movie">{overview}</p>
       </div>
     </li>
   );
