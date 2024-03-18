@@ -8,8 +8,8 @@ const ListMovies = ({ movies, total, totalPages, handlePageChange, current }) =>
   return (
     <>
       <ul className="content__list">
-        {movies.map(({ title, posterPath, date, desc, id }) => {
-          return <Card key={id} title={title} releaseDate={date} overview={desc} img={posterPath} />;
+        {movies.map(({ title, posterPath, date, desc, id, rate }) => {
+          return <Card key={id} title={title} releaseDate={date} overview={desc} img={posterPath} rate={rate}/>;
         })}
       </ul>
       <Pagination className='pagination' total={total} pageSize={20} onChange={handlePageChange} current={current} showSizeChanger={false}/>

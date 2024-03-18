@@ -76,6 +76,7 @@ const App = () => {
       spiner
     );
 
+  // console.log(movies.rate);
   return (
     <main className="content">
       <Tabs
@@ -85,10 +86,12 @@ const App = () => {
             label: `Search`,
             key: 1,
             children: (
+              // <SwapiServiceProvider value={movies}>
               <>
                 <Header onSearch={handleSearch} />
                 {content}
               </>
+              // </SwapiServiceProvider>
             ),
           },
           {

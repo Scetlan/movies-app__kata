@@ -64,9 +64,24 @@ background: rgb(255, 255, 255);
 }
 
 .content__list-item {
+  position: relative;
   width: 451px;
-  height: 279px;
+  min-height: 279px;
   display: flex;
+
+  box-shadow: -2px 3px 9px rgba(0, 0, 0, 0.2);
+
+}
+
+.overall-rating{
+  position: absolute;
+  top: 11px;
+  right: 8px;
+
+  padding: 6px 8px;
+
+  border: 2px solid #E9D100;
+  border-radius: 100px;
 }
 
 .date {
@@ -75,6 +90,7 @@ background: rgb(255, 255, 255);
 }
 
 .title {
+  width: 194px;
   font-size: 16px;
   margin-bottom: 10px;
 }
@@ -98,13 +114,19 @@ background: rgb(255, 255, 255);
   overflow: hidden;
 	text-overflow: ellipsis;
 	display: -webkit-box;
-	-webkit-line-clamp: 6;
+	-webkit-line-clamp: 5;
 	-webkit-box-orient: vertical;
 }
 
-.content__list-item {
-  box-shadow: -2px 3px 9px rgba(0, 0, 0, 0.2);
+.description {
+  margin-bottom: 10px;
 }
+
+ul.ant-rate {
+  position: absolute;
+  bottom: 12px;
+}
+
 .spiner {
   margin-top: 10px;
 }
@@ -112,3 +134,4 @@ background: rgb(255, 255, 255);
 .pagination, .alert-error {
   text-align: center;
 }
+
