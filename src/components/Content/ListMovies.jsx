@@ -3,14 +3,16 @@ import Card from './ListCard/Card';
 import { Pagination } from 'antd';
 
 const ListMovies = ({ movies, total, totalPages, handlePageChange, current }) => {
+  console.log(totalPages);
+
   return (
     <>
       <ul className="content__list">
-        {movies.map(({ title, backdrop_path, release_date, overview, id }) => {
-          return <Card key={id} title={title} releaseDate={release_date} overview={overview} img={backdrop_path} />;
+        {movies.map(({ title, posterPath, date, desc, id }) => {
+          return <Card key={id} title={title} releaseDate={date} overview={desc} img={posterPath} />;
         })}
       </ul>
-      <Pagination className='pagination' total={total} defaultPageSize={20} pageSize={totalPages} onChange={handlePageChange} current={current} showSizeChanger={false}/>
+      <Pagination className='pagination' total={total} pageSize={20} onChange={handlePageChange} current={current} showSizeChanger={false}/>
     </>
   );
 };
