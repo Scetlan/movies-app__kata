@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { SwapiService } from './service/swapiService';
 import ListMovies from './components/Content/ListMovies';
-import { Spin } from 'antd';
+import { Spin, Tabs } from 'antd';
 import Header from './components/Header/Header';
 import { debounce } from 'lodash';
 import Alert from 'antd/es/alert/Alert';
 import formatDate from './utils/formatDate';
+import { SwapiServiceProvider, SwapiServiceConsumer } from './service/ProviderMovies';
 
 const App = () => {
   const [movies, setMovies] = useState([]);
@@ -47,8 +48,8 @@ const App = () => {
     setLoading(true);
     setSearchQuery(event.target.value);
   };
- 
-  const handlePageChange = async (page) => {
+
+  const handlePageChange = async page => {
     console.log(page);
     setCurrent(page);
     setLoading(true);
@@ -60,22 +61,43 @@ const App = () => {
   const spiner = loading ? (
     <Spin className="spiner" tip="Loading" size="large" />
   ) : (
-    <ListMovies movies={movies} totalPages={movies.length} total={totalResults} handlePageChange={handlePageChange} current={current}/>
+    <ListMovies
+      movies={movies}
+      totalPages={movies.length}
+      total={totalResults}
+      handlePageChange={handlePageChange}
+      current={current}
+    />
   );
-  const content = !loading && movies.length === 0 ? <Alert className='alert-error' message="No results found" type="success" /> : spiner;
-
-  // const newMap = new Map();
-  // genres.map( ({id, name}) => newMap.set(id, name));
-
-
-  // // console.log(newMap.get(27));
-  // console.log(movies);
-  // console.log(movies[0].genre_ids);
+  const content =
+    !loading && movies.length === 0 ? (
+      <Alert className="alert-error" message="No results found" type="success" />
+    ) : (
+      spiner
+    );
 
   return (
     <main className="content">
-      <Header onSearch={handleSearch} />
-      {content}
+      <Tabs
+        defaultActiveKey="1"
+        items={[
+          {
+            label: `Search`,
+            key: 1,
+            children: (
+              <>
+                <Header onSearch={handleSearch} />
+                {content}
+              </>
+            ),
+          },
+          {
+            label: `Rated`,
+            key: 2,
+            children: `Content of tab 2`,
+          },
+        ]}
+      />
     </main>
   );
 };

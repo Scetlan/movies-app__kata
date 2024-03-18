@@ -26,6 +26,14 @@ p {
   line-height: 22px;
 }
 
+.ant-tabs > .ant-tabs-nav{
+  margin: 0 auto;
+}
+
+.ant-tabs-content-holder {
+  margin-top: 20px;
+}
+
 #root {
   max-width: 1010px;
 

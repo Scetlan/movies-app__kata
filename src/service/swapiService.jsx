@@ -42,7 +42,7 @@ export class SwapiService {
     title: movie.title,
     desc: movie.overview,
     date: movie.release_date,
-    posterPath: !movie.poster_path ? '' : `${_api_posters}${movie.poster_path}`,
+    posterPath: !movie.poster_path ? '' : `${this._api_posters}${movie.poster_path}`,
     rate: movie.vote_average,
     genres: movie.genre_ids,
     rating: movie.rating || 0,
