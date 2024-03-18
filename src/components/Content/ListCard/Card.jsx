@@ -16,9 +16,8 @@ const Card = ({ title, releaseDate, overview, img, rate }) => {
           return <span className="overall-rating">{value}</span>;
         }}
       </SwapiServiceConsumer> */}
-      <span className="overall-rating">
-        {String(rate).slice(0, 3)}
-        {/* {rate} */}
+        <span className="overall-rating">
+          {String(rate).slice(0, 3)}
         </span>
       <img className="pic" src={isImg ? photo : img} alt={`${title}`} />
       <div className="description">

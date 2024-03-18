@@ -77,11 +77,9 @@ background: rgb(255, 255, 255);
   position: absolute;
   top: 11px;
   right: 8px;
-
-  padding: 6px 8px;
-
   border: 2px solid #E9D100;
-  border-radius: 100px;
+  border-radius: 100%;
+  padding: 6px 8px;
 }
 
 .date {
