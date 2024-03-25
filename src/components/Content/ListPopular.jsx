@@ -21,15 +21,15 @@ const ListPopular = () => {
     const fetchMovies = async () => {
       try {
         setLoading(true);
-        const { PopularMovies, totalMovies } = await api.getPopularMovie('ru-RU', current);
+        const { movies, res } = await api.getPopularMovie('ru-RU', 1);
         const arrGenre = await api.getMoviesGenre('ru');
         setListGenre(arrGenre);
-        setTotalResults(totalMovies);
-        const updatedResults = PopularMovies.map(movie => ({
-          ...movie,
-          date: formatDate(movie.date),
-        }));
-        setMovies(updatedResults);
+        setTotalResults(res.total_results);
+        // const updatedResults = movies.map(movie => ({
+        //   ...movie,
+        //   date: formatDate(movie.date),
+        // }));
+        setMovies(movies);
       } catch (error) {
         console.log(error);
       } finally {
@@ -47,17 +47,16 @@ const ListPopular = () => {
       setTimeout(async () => {
         if (!event.target.value) return;
         setSearchQuery(event.target.value);
-        const { movies, totalMovies } = await api.searchMoviesByTitle(event.target.value);
+        const { movies, res } = await api.searchMoviesByTitle(event.target.value);
         const arrGenre = await api.getMoviesGenre('ru');
         setListGenre(arrGenre);
         setLoading(false);
-        setTotalResults(totalMovies);
-        const updatedResults = movies.map(movie => ({
-          ...movie,
-          date: formatDate(movie.date),
-        }));
-        setMovies(updatedResults);
-        console.log(movies);
+        setTotalResults(res.total_results);
+        // const updatedResults = movies.map(movie => ({
+        //   ...movie,
+        //   date: formatDate(movie.date),
+        // }));
+        setMovies(movies);
       }, 3000);
     } catch (error) {
       console.log('Ошибка 2: ' + error);
@@ -91,7 +90,7 @@ const ListPopular = () => {
       spiner
     );
 
-  console.log(movies, loading, current, searchQuery, totalResults, listGenres);
+  console.log(movies);
 
   return (
     <ContextMovies.Provider value={listGenres}>
