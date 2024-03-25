@@ -1,21 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import photo from './img/noPhoto.jpg';
 import ListGenre from '../../Genre/ListGenre';
 import { Rate } from 'antd';
-// import { SwapiServiceConsumer } from '../../../service/ProviderMovies';
+import { ContextMovies } from '../../../service/ContextMovies';
+import createGenres from '../../../utils/createGenres';
 
-const Card = ({ title, releaseDate, overview, img, rate }) => {
+const Card = ({ title, releaseDate, overview, img, rate, genres }) => {
   const isImg = img === '';
+
+  const listGenres = useContext(ContextMovies);
 
   return (
     <li className="content__list-item">
-      {/* <SwapiServiceConsumer>
-        {value => {
-          const rate = value;
-          console.log(rate);
-          return <span className="overall-rating">{value}</span>;
-        }}
-      </SwapiServiceConsumer> */}
         <span className="overall-rating">
           {String(rate).slice(0, 3)}
         </span>
@@ -23,7 +19,7 @@ const Card = ({ title, releaseDate, overview, img, rate }) => {
       <div className="description">
         <h2 className="title">{title}</h2>
         <p className="date">{releaseDate}</p>
-        <ListGenre />
+        <ListGenre arrGenres={createGenres(listGenres, genres)}/>
         <p className="plot-movie">{overview}</p>
         <Rate
           allowHalf
