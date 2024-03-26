@@ -10,8 +10,8 @@ export class SwapiService {
   getRootHeaders = {
     method: 'GET',
     headers: {
-      Authorization: this._token,
       accept: 'application/json',
+      Authorization: this._token
     },
   };
 
@@ -32,9 +32,10 @@ export class SwapiService {
   }
 
   async getPopularMovie(language = 'ru-RU', page = 1) {
-    const res = await this.getResource(`/movie/popular?language=${language}&page=${page.toString()}`, this.getRootHeaders);
+    const res = await this.getResource(`/movie/popular?language=${language}&page=${page}`, this.getRootHeaders).json();
     const movies = res.results.map(this.transformMovie);
-    return { movies, res };
+    const totalMovies = res.total_results;
+    return { movies, totalMovies };
   }
 
   async getRatedMovies(language = 'ru-RU', page = 1, sort = 'created_at.asc' | 'created_at.desc') {

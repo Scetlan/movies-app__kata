@@ -18,13 +18,25 @@ const ListPopular = () => {
   const [listGenres, setListGenre] = useState([]);
 
   useEffect(() => {
+    const options = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4NjU1YTEwZWExMGIyNGMyNmI3MTljZWZkY2UyYzQ0YyIsInN1YiI6IjY1ZTBhYWI1MmQ1MzFhMDE4NWMwNWIxMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.yqUGsWTRCk1OjbKLU9FaU0dLJy0BQxo_fcfMKP6c3VA'
+      }
+    };
+    
+    fetch('https://api.themoviedb.org/3/movie/popular?language=en-US&page=1', options)
+      .then(response => response.json())
+      .then(response => console.log(response))
+      .catch(err => console.error(err));
     const fetchMovies = async () => {
       try {
         setLoading(true);
-        const { movies, res } = await api.getPopularMovie('ru-RU', 1);
+        const { movies, totalMovies } = await api.getPopularMovie('ru-RU', 1);
         const arrGenre = await api.getMoviesGenre('ru');
         setListGenre(arrGenre);
-        setTotalResults(res.total_results);
+        setTotalResults(totalMovies.total_results);
         // const updatedResults = movies.map(movie => ({
         //   ...movie,
         //   date: formatDate(movie.date),
@@ -47,11 +59,11 @@ const ListPopular = () => {
       setTimeout(async () => {
         if (!event.target.value) return;
         setSearchQuery(event.target.value);
-        const { movies, res } = await api.searchMoviesByTitle(event.target.value);
+        const { movies, totalMovies } = await api.searchMoviesByTitle(event.target.value);
         const arrGenre = await api.getMoviesGenre('ru');
         setListGenre(arrGenre);
         setLoading(false);
-        setTotalResults(res.total_results);
+        setTotalResults(totalMovies.total_results);
         // const updatedResults = movies.map(movie => ({
         //   ...movie,
         //   date: formatDate(movie.date),
