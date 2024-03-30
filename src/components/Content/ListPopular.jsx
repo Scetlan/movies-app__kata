@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Card from './ListCard/Card';
 import { Alert, Pagination, Spin } from 'antd';
 import Search from '../Search/Search';
-import { ContextMovies } from '../../service/ContextMovies';
 import { debounce } from 'lodash';
 import { SwapiService } from '../../service/swapiService';
 import formatDateMovie from '../../utils/formatDate';
@@ -56,11 +55,21 @@ const ListPopular = ({ state }) => {
       <Spin className="spiner__component" tip="Loading..." size="large" />
     </div>
   ) : (
-    <ul className="content__list">
-      {movies.map(movie => (
-        <Card key={movie.id} movie={movie} />
-      ))}
-    </ul>
+    <>
+      <ul className="content__list">
+        {movies.map(movie => (
+          <Card key={movie.id} movie={movie} />
+        ))}
+      </ul>
+      <Pagination
+        className="pagination"
+        total={totalResults}
+        pageSize={20}
+        onChange={handlePageChange}
+        current={current}
+        showSizeChanger={false}
+      />
+    </>
   );
   const content =
     !loading && movies.length === 0 ? (
@@ -73,14 +82,6 @@ const ListPopular = ({ state }) => {
     <>
       <Search onSearch={handleSearch} />
       {content}
-      <Pagination
-        className="pagination"
-        total={totalResults}
-        pageSize={20}
-        onChange={handlePageChange}
-        current={current}
-        showSizeChanger={false}
-      />
     </>
   );
 };

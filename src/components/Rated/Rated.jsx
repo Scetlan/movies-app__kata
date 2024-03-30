@@ -1,27 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { SwapiService } from '../../service/swapiService';
 import CardRated from './CardRated';
-import formatDateMovie from '../../utils/formatDate';
+import { Spin } from 'antd';
 
 const api = new SwapiService();
 
 const Rated = () => {
-  const [rateMovies, setRateMovies] = useState();
+  const [rateMovies, setRateMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const { movies, totalMovies } = await api.getRatedMovies('ru-RU', 1);
-        const updatedResults = movies
-        // .map(movie => {
-        //   return {
-        //     ...movie,
-        //     release_date: formatDateMovie(movie.release_date),
-        //   };
-        // });
-          setRateMovies(updatedResults);
+        const { movies } = await api.getRatedMovies('ru-RU', 1);
         console.log(movies);
+        setRateMovies(movies);
       } catch (error) {
         console.log(`rate: ${error}`);
       } finally {
@@ -32,7 +25,11 @@ const Rated = () => {
   }, []);
 
   if (isLoading || !rateMovies) {
-    return <div>Loading...</div>;
+    return (
+      <div className="spiner">
+        <Spin className="spiner__component" tip="Loading..." size="large" />
+      </div>
+    );
   }
 
   return (

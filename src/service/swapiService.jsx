@@ -1,4 +1,5 @@
 import Cookies from 'js-cookie';
+import formatDateMovie from '../utils/formatDate';
 
 export class SwapiService {
   _apiUrl = 'https://api.themoviedb.org/3';
@@ -83,7 +84,6 @@ export class SwapiService {
   }
 
   transformMovie = movie => ({
-    origin_language: 'ru',
     id: movie.id,
     title: movie.title,
     overview: movie.overview,
