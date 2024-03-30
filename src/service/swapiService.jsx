@@ -11,16 +11,11 @@ export class SwapiService {
     method: 'GET',
     headers: {
       accept: 'application/json',
-      Authorization: this._token
+      Authorization: this._token,
     },
   };
 
-  get getSession() {
-    return Cookies.get('guest_session_id');
-  }
-
   async getResource(url, options) {
-    
     const res = await fetch(`${this._apiUrl}${url}`, options);
     if (!res.ok) throw new Error(`Could not fetch ${this._apiUrl} , received ${res.status}`);
 
@@ -31,46 +26,42 @@ export class SwapiService {
     return await this.getResource(`/authentication/guest_session/new`, this.getRootHeaders);
   }
 
-  async getPopularMovie(language = 'ru-RU', page = 1) {
-    const res = await this.getResource(`/movie/popular?language=${language}&page=${page}`, this.getRootHeaders).json();
-    const movies = res.results.map(this.transformMovie);
-    const totalMovies = res.total_results;
-    return { movies, totalMovies };
-  }
-
-  async getRatedMovies(language = 'ru-RU', page = 1, sort = 'created_at.asc' | 'created_at.desc') {
-    return this.getResponse(
-      `/guest_session/${Cookies.get('guest_session_id')}/rated/movies?api_key=${
-        this._api_key
-      }&language=${language}&page=${page.toString()}&sort_by=${sort}`,
+  async getRatedMovies(language = 'ru-RU', page) {
+    const res = await this.getResource(
+      `/guest_session/${Cookies.get('guest_session_id')}/rated/movies?api_key=${this._api_key}&language=${language}&page=${page.toString()}`,
       {
         method: 'GET',
         headers: { accept: 'application/json' },
       }
     );
+
+    const movies = res.results.map(this.transformMovie);
+    const totalMovies = res.total_results;
+
+    return { movies, totalMovies };
   }
 
-  async postAddRating(movieId, body, headers) {
-    return this.getResponse(
-      `/movie/${movieId.toString()}/rating?guest_session_id=${Cookies.get('guest_session_id')}&api_key=${
+  async postAddRating(movieId, body, language = 'ru-RU') {
+    return this.getResource(
+      `/movie/${movieId.toString()}/rating?guest_session_id=${Cookies.get('guest_session_id')}&language=${language}&api_key=${
         this._api_key
       }`,
       {
-        method: 'GET',
-        headers,
+        method: 'POST',
+        headers: { accept: 'application/json', 'Content-Type': 'application/json;charset=utf-8' },
         body: body,
       }
     );
   }
 
-  async deleteRating(movieId, headers) {
-    return this.getResponse(
+  async deleteRating(movieId) {
+    return this.getResource(
       `/movie/${movieId.toString()}/rating?guest_session_id=${Cookies.get('guest_session_id')}&api_key=${
         this._api_key
       }`,
       {
         method: 'DELETE',
-        headers,
+        headers: { accept: 'application/json', 'Content-Type': 'application/json;charset=utf-8' },
       }
     );
   }
@@ -91,27 +82,16 @@ export class SwapiService {
     return await genres;
   }
 
-  isApiError(error) {
-    if (error.message) {
-      return ['FetchError'].includes(error.message);
-    }
-  }
-
-  isApiResponse(error) {
-    if (error.message) {
-      return ['ServerError'].includes(error.message);
-    }
-  }
-
   transformMovie = movie => ({
+    origin_language: 'ru',
     id: movie.id,
     title: movie.title,
-    desc: movie.overview,
-    date: movie.release_date,
-    posterPath: !movie.poster_path ? '' : `${this._api_posters}${movie.poster_path}`,
-    rate: movie.vote_average,
-    genres: movie.genre_ids,
-    rating: movie.rating || 0,
+    overview: movie.overview,
+    release_date: movie.release_date,
+    poster_path: !movie.poster_path ? '' : `${this._api_posters}${movie.poster_path}`,
+    vote_average: movie.vote_average,
+    genre_ids: movie.genre_ids,
+    rating: !movie.rating ? 0 : movie.rating,
     guestSessionId: '',
     tabPane: '1',
   });

@@ -1,14 +1,14 @@
 import React, { useContext } from 'react';
-import photo from './img/noPhoto.jpg';
-import ListGenre from '../../Genre/ListGenre';
+import photo from '../Content/ListCard/img/noPhoto.jpg';
+import { ContextMovies } from '../../service/ContextMovies';
+import ListGenre from '../Genre/ListGenre';
 import { Rate } from 'antd';
-import { ContextMovies } from '../../../service/ContextMovies';
-import createGenres from '../../../utils/createGenres';
-import { SwapiService } from '../../../service/swapiService';
+import createGenres from '../../utils/createGenres';
+import { SwapiService } from '../../service/swapiService';
 
 const api = new SwapiService();
 
-const Card = ({ movie }) => {
+const CardRated = ({ movie }) => {
   const { title, poster_path, release_date, overview, id, vote_average, genre_ids, rating } = movie;
   const isImg = poster_path === '';
 
@@ -29,12 +29,12 @@ const Card = ({ movie }) => {
     border: `2px solid ${genresBorderColor}`,
   };
 
-  const handleRating = vote_average => {
-    if (vote_average === 0) {
+  const handleRating = rate => {
+    if (rate === 0) {
       api.deleteRating(id);
       return;
     }
-    api.postAddRating(id, JSON.stringify({ value: vote_average }));
+    api.postAddRating(id, JSON.stringify({ value: rate }));
   };
 
   const createGenre = createGenres(listGenres, genre_ids);
@@ -56,10 +56,11 @@ const Card = ({ movie }) => {
           count={10}
           style={{ fontSize: 16 }}
           onChange={handleRating}
+          defaultValue={rating}
         />
       </div>
     </li>
   );
 };
 
-export default Card;
+export default CardRated;

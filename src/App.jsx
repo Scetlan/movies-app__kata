@@ -1,40 +1,47 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tabs } from 'antd';
 import ListPopular from './components/Content/ListPopular';
 import { SwapiService } from './service/swapiService';
 import Cookies from 'js-cookie';
+import Rated from './components/Rated/Rated';
+import { ContextMovies } from './service/ContextMovies';
 
 const api = new SwapiService();
 
 const App = () => {
+  const getSession = Cookies.get('guest_session_id');
+
+  const [listGenres, setListGenre] = useState([]);
 
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const session = !api.getSession && (await api.getAccessGuestSession());
+        const session = !getSession && (await api.getAccessGuestSession());
         session &&
           Cookies.set('guest_session_id', session.guest_session_id, {
             expires: 1,
           });
       } catch (error) {
-       console.log(error.message);
+        console.log(error.message);
       }
     };
 
     fetchMovies();
   }, []);
-  
+
   return (
     <main className="content">
       <header className="menu">
-        <Tabs defaultActiveKey="1" centered>
-          <Tabs.TabPane tab="Search" key="1">
-            <ListPopular/>
-          </Tabs.TabPane>
-          <Tabs.TabPane tab="Rated" key="2" destroyInactiveTabPane>
-            {/* <Rate />  - здесь должен быть список тех фильмов, которые я оценила*/}
-          </Tabs.TabPane>
-        </Tabs>
+        <ContextMovies.Provider value={listGenres}>
+          <Tabs defaultActiveKey="1" centered>
+            <Tabs.TabPane tab="Search" key="1">
+              <ListPopular state={setListGenre} />
+            </Tabs.TabPane>
+            <Tabs.TabPane tab="Rated" key="2" destroyInactiveTabPane>
+              <Rated />
+            </Tabs.TabPane>
+          </Tabs>
+        </ContextMovies.Provider>
       </header>
     </main>
   );
