@@ -80,7 +80,7 @@ const ListPopular = ({ state }) => {
 
   return (
     <>
-      <Search onSearch={handleSearch} />
+      <Search className='search' onSearch={handleSearch} />
       {content}
     </>
   );
