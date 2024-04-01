@@ -143,6 +143,17 @@ div.pagination {
   margin-top: 10px;
 }
 
+.spiner {
+  display: flex;
+  width: 100%;
+  margin-top: 14px;
+}
+
+.spiner__component {
+  width: 100px;
+  margin: 0 auto;
+}
+
 @media screen and (min-width: 800px) {
   .content__list-item {
     max-width: 500px;
@@ -213,16 +224,5 @@ div.pagination {
   ul.ant-rate {
     position: absolute;
     bottom: 12px;
-  }
-
-  .spiner {
-    display: flex;
-    width: 100%;
-    margin-top: 14px;
-  }
-
-  .spiner__component {
-    width: 100px;
-    margin: 0 auto;
   }
 }
