@@ -1,11 +1,9 @@
-import React from 'react';
-
-const ErrorIndicator = () => {
+function ErrorIndicator() {
   return (
-    <div className='error-indicator'>
+    <div className="error-indicator">
       <span>BOOM!</span>
     </div>
   );
-};
+}
 
 export default ErrorIndicator;

@@ -1,3 +1,4 @@
-import { createContext } from "react";
+import { createContext } from 'react';
 
-export const ContextMovies = createContext(new Map());
+const ContextMovies = createContext(new Map());
+export default ContextMovies;

@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { Tabs } from 'antd';
+import ContextMovies from './service/ContextMovies';
 import ListMovies from './components/Content/ListMovies';
-import { SwapiService } from './service/swapiService';
-import Cookies from 'js-cookie';
+import SwapiService from './service/swapiService';
 import Rated from './components/Rated/Rated';
-import { ContextMovies } from './service/ContextMovies';
+import Cookies from 'js-cookie';
+
+import { Tabs } from 'antd';
+import { useEffect, useState } from 'react';
 
 const api = new SwapiService();
 
-const App = () => {
+function App() {
   const getSession = Cookies.get('guest_session_id');
 
   const [listGenres, setListGenre] = useState([]);
@@ -17,17 +18,18 @@ const App = () => {
     const fetchMovies = async () => {
       try {
         const session = !getSession && (await api.getAccessGuestSession());
-        session &&
+        if (session) {
           Cookies.set('guest_session_id', session.guest_session_id, {
             expires: 1,
           });
+        }
       } catch (error) {
-        console.log(error.message);
+        throw new Error(error.message);
       }
     };
 
     fetchMovies();
-  }, []);
+  }, [getSession]);
 
   return (
     <main className="content">
@@ -45,6 +47,6 @@ const App = () => {
       </header>
     </main>
   );
-};
+}
 
 export default App;
