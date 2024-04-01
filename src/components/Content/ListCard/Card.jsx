@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import photo from './img/noPhoto.jpg';
 import ListGenre from '../../Genre/ListGenre';
 import { Rate } from 'antd';
@@ -13,6 +13,17 @@ const Card = ({ movie }) => {
   const isImg = poster_path === '';
 
   const listGenres = useContext(ContextMovies);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   let genresBorderColor = '';
   if (vote_average <= 3) genresBorderColor = '#E90000';
@@ -22,10 +33,12 @@ const Card = ({ movie }) => {
 
   const style = {
     position: 'absolute',
+    display: 'flex',
     top: '11px',
     right: '8px',
     borderRadius: '100%',
-    padding: '6px 8px',
+    padding: '4px 5px',
+    fontSize: '12px',
     border: `2px solid ${genresBorderColor}`,
   };
 
@@ -39,8 +52,8 @@ const Card = ({ movie }) => {
 
   const createGenre = createGenres(listGenres, genre_ids);
 
-  return (
-    <li className="content__list-item">
+  const desktop = (
+    <>
       <span className="overall-rating" style={style}>
         {String(vote_average).slice(0, 3)}
       </span>
@@ -50,16 +63,43 @@ const Card = ({ movie }) => {
         <p className="date">{release_date}</p>
         <ListGenre arrGenres={createGenre} />
         <p className="plot-movie">{overview}</p>
-        <Rate
-          allowHalf
-          allowClear={false}
-          count={10}
-          style={{ fontSize: 16 }}
-          onChange={handleRating}
-        />
       </div>
-    </li>
+      <Rate
+        className="rate-stars"
+        allowHalf
+        allowClear={false}
+        count={10}
+        style={{ fontSize: 16 }}
+        onChange={handleRating}
+      />
+    </>
   );
+  const mobile = (
+    <>
+      <span className="overall-rating" style={style}>
+        {String(vote_average).slice(0, 3)}
+      </span>
+      <div className="block-mobile">
+        <img className="pic" src={isImg ? photo : poster_path} alt={`${title}`} />
+        <div className="description">
+          <h2 className="title">{title}</h2>
+          <p className="date">{release_date}</p>
+          <ListGenre arrGenres={createGenre} />
+        </div>
+      </div>
+      <p className="plot-movie">{overview}</p>
+      <Rate
+        className="rate-stars"
+        allowHalf
+        allowClear={false}
+        count={10}
+        style={{ fontSize: 16 }}
+        onChange={handleRating}
+      />
+    </>
+  );
+
+  return <li className="content__list-item">{window.innerWidth >= 1000 ? desktop : mobile}</li>;
 };
 
 export default Card;

@@ -22,10 +22,12 @@ const CardRated = ({ movie }) => {
 
   const style = {
     position: 'absolute',
+    display: 'flex',
     top: '11px',
     right: '8px',
     borderRadius: '100%',
-    padding: '6px 8px',
+    padding: '4px 5px',
+    'font-size': '12px',
     border: `2px solid ${genresBorderColor}`,
   };
 
@@ -39,8 +41,8 @@ const CardRated = ({ movie }) => {
 
   const createGenre = createGenres(listGenres, genre_ids);
 
-  return (
-    <li className="content__list-item">
+  const desktop = (
+    <>
       <span className="overall-rating" style={style}>
         {String(vote_average).slice(0, 3)}
       </span>
@@ -50,17 +52,66 @@ const CardRated = ({ movie }) => {
         <p className="date">{release_date}</p>
         <ListGenre arrGenres={createGenre} />
         <p className="plot-movie">{overview}</p>
-        <Rate
-          allowHalf
-          allowClear={false}
-          count={10}
-          style={{ fontSize: 16 }}
-          onChange={handleRating}
-          defaultValue={rating}
-        />
       </div>
-    </li>
+      <Rate
+        className="rate-stars"
+        allowHalf
+        allowClear={false}
+        count={10}
+        style={{ fontSize: 16 }}
+        onChange={handleRating}
+        defaultValue={rating}
+      />
+    </>
   );
+  const mobile = (
+    <>
+      <span className="overall-rating" style={style}>
+        {String(vote_average).slice(0, 3)}
+      </span>
+      <div className='block-mobile'>
+        <img className="pic" src={isImg ? photo : poster_path} alt={`${title}`} />
+        <div className="description">
+          <h2 className="title">{title}</h2>
+          <p className="date">{release_date}</p>
+          <ListGenre arrGenres={createGenre} />
+        </div>
+      </div>
+      <p className="plot-movie">{overview}</p>
+      <Rate
+        className="rate-stars"
+        allowHalf
+        allowClear={false}
+        count={10}
+        style={{ fontSize: 16 }}
+        onChange={handleRating}
+        defaultValue={rating}
+      />
+    </>
+  );
+
+  return <li className="content__list-item">{window.innerWidth >= 1000 ? desktop : mobile}</li>;
+  // return (
+  //   <li className="content__list-item">
+  //     <span className="overall-rating" style={style}>
+  //       {String(vote_average).slice(0, 3)}
+  //     </span>
+  //     <img className="pic" src={isImg ? photo : poster_path} alt={`${title}`} />
+  //     <div className="description">
+  //       <h2 className="title">{title}</h2>
+  //       <p className="date">{release_date}</p>
+  //       <ListGenre arrGenres={createGenre} />
+  //       <p className="plot-movie">{overview}</p>
+  //       <Rate
+  //         allowHalf
+  //         allowClear={false}
+  //         count={10}
+  //         style={{ fontSize: 16 }}
+  //         onChange={handleRating}
+  //       />
+  //     </div>
+  //   </li>
+  // );
 };
 
 export default CardRated;

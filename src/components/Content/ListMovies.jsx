@@ -8,7 +8,7 @@ import formatDateMovie from '../../utils/formatDate';
 
 const api = new SwapiService();
 
-const ListPopular = ({ state }) => {
+const ListMovies = ({ state }) => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = useState(1);
@@ -21,7 +21,7 @@ const ListPopular = ({ state }) => {
       if (!value) return;
       setSearchQuery(value);
       const { movies, totalMovies } = await api.searchMoviesByTitle(value);
-      const arrGenre = await api.getMoviesGenre('ru');
+      const arrGenre = await api.getMoviesGenre();
       state(arrGenre);
       setLoading(false);
       setTotalResults(totalMovies);
@@ -61,14 +61,16 @@ const ListPopular = ({ state }) => {
           <Card key={movie.id} movie={movie} />
         ))}
       </ul>
-      <Pagination
-        className="pagination"
-        total={totalResults}
-        pageSize={20}
-        onChange={handlePageChange}
-        current={current}
-        showSizeChanger={false}
-      />
+      <div className='pagination'>
+        <Pagination
+          className="pagination"
+          total={totalResults}
+          pageSize={20}
+          onChange={handlePageChange}
+          current={current}
+          showSizeChanger={false}
+        />
+      </div>
     </>
   );
   const content =
@@ -80,10 +82,10 @@ const ListPopular = ({ state }) => {
 
   return (
     <>
-      <Search className='search' onSearch={handleSearch} />
+      <Search className="search" onSearch={handleSearch} />
       {content}
     </>
   );
 };
 
-export default ListPopular;
+export default ListMovies;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Tabs } from 'antd';
-import ListPopular from './components/Content/ListPopular';
+import ListMovies from './components/Content/ListMovies';
 import { SwapiService } from './service/swapiService';
 import Cookies from 'js-cookie';
 import Rated from './components/Rated/Rated';
@@ -35,7 +35,7 @@ const App = () => {
         <ContextMovies.Provider value={listGenres}>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Search" key="1">
-              <ListPopular state={setListGenre} />
+              <ListMovies state={setListGenre} />
             </Tabs.TabPane>
             <Tabs.TabPane tab="Rated" key="2" destroyInactiveTabPane>
               <Rated />

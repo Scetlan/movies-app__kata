@@ -27,9 +27,9 @@ export class SwapiService {
     return await this.getResource(`/authentication/guest_session/new`, this.getRootHeaders);
   }
 
-  async getRatedMovies(language = 'ru-RU', page) {
+  async getRatedMovies(page) {
     const res = await this.getResource(
-      `/guest_session/${Cookies.get('guest_session_id')}/rated/movies?api_key=${this._api_key}&language=${language}&page=${page.toString()}`,
+      `/guest_session/${Cookies.get('guest_session_id')}/rated/movies?api_key=${this._api_key}&page=${page.toString()}`,
       {
         method: 'GET',
         headers: { accept: 'application/json' },
@@ -42,9 +42,9 @@ export class SwapiService {
     return { movies, totalMovies };
   }
 
-  async postAddRating(movieId, body, language = 'ru-RU') {
+  async postAddRating(movieId, body) {
     return this.getResource(
-      `/movie/${movieId.toString()}/rating?guest_session_id=${Cookies.get('guest_session_id')}&language=${language}&api_key=${
+      `/movie/${movieId.toString()}/rating?guest_session_id=${Cookies.get('guest_session_id')}&language=en-US&api_key=${
         this._api_key
       }`,
       {
@@ -67,9 +67,9 @@ export class SwapiService {
     );
   }
 
-  async searchMoviesByTitle(title, page = 1, language = 'ru-RU') {
+  async searchMoviesByTitle(title, page = 1) {
     const res = await this.getResource(
-      `/search/movie?language=${language}&query=${title}&page=${page}&api_key=${this._api_key}`,
+      `/search/movie?language=en-US&query=${title}&page=${page}&api_key=${this._api_key}`,
       this.getRootHeaders
     );
     const movies = res.results.map(this.transformMovie);
@@ -78,8 +78,8 @@ export class SwapiService {
     return { movies, totalMovies };
   }
 
-  async getMoviesGenre(lang = 'ru-RU') {
-    const { genres } = await this.getResource(`/genre/movie/list?language=${lang}`, this.getRootHeaders);
+  async getMoviesGenre() {
+    const { genres } = await this.getResource(`/genre/movie/list?language=en-US`, this.getRootHeaders);
     return await genres;
   }
 

@@ -12,7 +12,7 @@ const Rated = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const { movies } = await api.getRatedMovies('ru-RU', 1);
+        const { movies } = await api.getRatedMovies(1);
         console.log(movies);
         setRateMovies(movies);
       } catch (error) {
