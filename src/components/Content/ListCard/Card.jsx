@@ -1,18 +1,20 @@
-import React, { useContext, useEffect, useState } from 'react';
 import photo from './img/noPhoto.jpg';
 import ListGenre from '../../Genre/ListGenre';
-import { Rate } from 'antd';
-import { ContextMovies } from '../../../service/ContextMovies';
+import ContextMovies from '../../../service/ContextMovies';
 import createGenres from '../../../utils/createGenres';
-import { SwapiService } from '../../../service/swapiService';
+import SwapiService from '../../../service/swapiService';
+import { Rate } from 'antd';
+
+import { useContext, useEffect, useState } from 'react';
 
 const api = new SwapiService();
 
-const Card = ({ movie }) => {
-  const { title, poster_path, release_date, overview, id, vote_average, genre_ids, rating } = movie;
-  const isImg = poster_path === '';
+function Card({ movie }) {
+  const { title, posterPath, releaseDate, overview, id, voteAverage, genreIds } = movie;
+  const isImg = posterPath === '';
 
   const listGenres = useContext(ContextMovies);
+  // eslint-disable-next-line
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   useEffect(() => {
@@ -26,10 +28,10 @@ const Card = ({ movie }) => {
   }, []);
 
   let genresBorderColor = '';
-  if (vote_average <= 3) genresBorderColor = '#E90000';
-  if (vote_average > 3 && vote_average <= 5) genresBorderColor = '#E97E00';
-  if (vote_average > 5 && vote_average <= 7) genresBorderColor = '#E9D100';
-  if (vote_average > 7) genresBorderColor = '#66E900';
+  if (voteAverage <= 3) genresBorderColor = '#E90000';
+  if (voteAverage > 3 && voteAverage <= 5) genresBorderColor = '#E97E00';
+  if (voteAverage > 5 && voteAverage <= 7) genresBorderColor = '#E9D100';
+  if (voteAverage > 7) genresBorderColor = '#66E900';
 
   const style = {
     position: 'absolute',
@@ -42,25 +44,25 @@ const Card = ({ movie }) => {
     border: `2px solid ${genresBorderColor}`,
   };
 
-  const handleRating = vote_average => {
-    if (vote_average === 0) {
+  const handleRating = rate => {
+    if (rate === 0) {
       api.deleteRating(id);
       return;
     }
-    api.postAddRating(id, JSON.stringify({ value: vote_average }));
+    api.postAddRating(id, JSON.stringify({ value: rate }));
   };
 
-  const createGenre = createGenres(listGenres, genre_ids);
+  const createGenre = createGenres(listGenres, genreIds);
 
   const desktop = (
     <>
       <span className="overall-rating" style={style}>
-        {String(vote_average).slice(0, 3)}
+        {String(voteAverage).slice(0, 3)}
       </span>
-      <img className="pic" src={isImg ? photo : poster_path} alt={`${title}`} />
+      <img className="pic" src={isImg ? photo : posterPath} alt={`${title}`} />
       <div className="description">
         <h2 className="title">{title}</h2>
-        <p className="date">{release_date}</p>
+        <p className="date">{releaseDate}</p>
         <ListGenre arrGenres={createGenre} />
         <p className="plot-movie">{overview}</p>
       </div>
@@ -77,13 +79,13 @@ const Card = ({ movie }) => {
   const mobile = (
     <>
       <span className="overall-rating" style={style}>
-        {String(vote_average).slice(0, 3)}
+        {String(voteAverage).slice(0, 3)}
       </span>
       <div className="block-mobile">
-        <img className="pic" src={isImg ? photo : poster_path} alt={`${title}`} />
+        <img className="pic" src={isImg ? photo : posterPath} alt={`${title}`} />
         <div className="description">
           <h2 className="title">{title}</h2>
-          <p className="date">{release_date}</p>
+          <p className="date">{releaseDate}</p>
           <ListGenre arrGenres={createGenre} />
         </div>
       </div>
@@ -100,6 +102,6 @@ const Card = ({ movie }) => {
   );
 
   return <li className="content__list-item">{window.innerWidth >= 1000 ? desktop : mobile}</li>;
-};
+}
 
 export default Card;

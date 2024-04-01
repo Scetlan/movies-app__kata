@@ -1,24 +1,25 @@
-import React, { useContext } from 'react';
 import photo from '../Content/ListCard/img/noPhoto.jpg';
-import { ContextMovies } from '../../service/ContextMovies';
+import ContextMovies from '../../service/ContextMovies';
 import ListGenre from '../Genre/ListGenre';
-import { Rate } from 'antd';
 import createGenres from '../../utils/createGenres';
-import { SwapiService } from '../../service/swapiService';
+import SwapiService from '../../service/swapiService';
+import { Rate } from 'antd';
+
+import { useContext } from 'react';
 
 const api = new SwapiService();
 
-const CardRated = ({ movie }) => {
-  const { title, poster_path, release_date, overview, id, vote_average, genre_ids, rating } = movie;
-  const isImg = poster_path === '';
+function CardRated({ movie }) {
+  const { title, posterPath, releaseDate, overview, id, voteAverage, genreIds, rating } = movie;
+  const isImg = posterPath === '';
 
   const listGenres = useContext(ContextMovies);
 
   let genresBorderColor = '';
-  if (vote_average <= 3) genresBorderColor = '#E90000';
-  if (vote_average > 3 && vote_average <= 5) genresBorderColor = '#E97E00';
-  if (vote_average > 5 && vote_average <= 7) genresBorderColor = '#E9D100';
-  if (vote_average > 7) genresBorderColor = '#66E900';
+  if (voteAverage <= 3) genresBorderColor = '#E90000';
+  if (voteAverage > 3 && voteAverage <= 5) genresBorderColor = '#E97E00';
+  if (voteAverage > 5 && voteAverage <= 7) genresBorderColor = '#E9D100';
+  if (voteAverage > 7) genresBorderColor = '#66E900';
 
   const style = {
     position: 'absolute',
@@ -39,17 +40,17 @@ const CardRated = ({ movie }) => {
     api.postAddRating(id, JSON.stringify({ value: rate }));
   };
 
-  const createGenre = createGenres(listGenres, genre_ids);
+  const createGenre = createGenres(listGenres, genreIds);
 
   const desktop = (
     <>
       <span className="overall-rating" style={style}>
-        {String(vote_average).slice(0, 3)}
+        {String(voteAverage).slice(0, 3)}
       </span>
-      <img className="pic" src={isImg ? photo : poster_path} alt={`${title}`} />
+      <img className="pic" src={isImg ? photo : posterPath} alt={`${title}`} />
       <div className="description">
         <h2 className="title">{title}</h2>
-        <p className="date">{release_date}</p>
+        <p className="date">{releaseDate}</p>
         <ListGenre arrGenres={createGenre} />
         <p className="plot-movie">{overview}</p>
       </div>
@@ -67,13 +68,13 @@ const CardRated = ({ movie }) => {
   const mobile = (
     <>
       <span className="overall-rating" style={style}>
-        {String(vote_average).slice(0, 3)}
+        {String(voteAverage).slice(0, 3)}
       </span>
-      <div className='block-mobile'>
-        <img className="pic" src={isImg ? photo : poster_path} alt={`${title}`} />
+      <div className="block-mobile">
+        <img className="pic" src={isImg ? photo : posterPath} alt={`${title}`} />
         <div className="description">
           <h2 className="title">{title}</h2>
-          <p className="date">{release_date}</p>
+          <p className="date">{releaseDate}</p>
           <ListGenre arrGenres={createGenre} />
         </div>
       </div>
@@ -94,12 +95,12 @@ const CardRated = ({ movie }) => {
   // return (
   //   <li className="content__list-item">
   //     <span className="overall-rating" style={style}>
-  //       {String(vote_average).slice(0, 3)}
+  //       {String(voteAverage).slice(0, 3)}
   //     </span>
-  //     <img className="pic" src={isImg ? photo : poster_path} alt={`${title}`} />
+  //     <img className="pic" src={isImg ? photo : posterPath} alt={`${title}`} />
   //     <div className="description">
   //       <h2 className="title">{title}</h2>
-  //       <p className="date">{release_date}</p>
+  //       <p className="date">{releaseDate}</p>
   //       <ListGenre arrGenres={createGenre} />
   //       <p className="plot-movie">{overview}</p>
   //       <Rate
@@ -112,6 +113,6 @@ const CardRated = ({ movie }) => {
   //     </div>
   //   </li>
   // );
-};
+}
 
 export default CardRated;

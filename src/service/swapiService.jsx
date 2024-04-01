@@ -1,65 +1,63 @@
 import Cookies from 'js-cookie';
-import formatDateMovie from '../utils/formatDate';
 
-export class SwapiService {
-  _apiUrl = 'https://api.themoviedb.org/3';
-  _token =
+export default class SwapiService {
+  apiUrl = 'https://api.themoviedb.org/3';
+
+  token =
     'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4NjU1YTEwZWExMGIyNGMyNmI3MTljZWZkY2UyYzQ0YyIsInN1YiI6IjY1ZTBhYWI1MmQ1MzFhMDE4NWMwNWIxMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.yqUGsWTRCk1OjbKLU9FaU0dLJy0BQxo_fcfMKP6c3VA';
-  _api_key = '8655a10ea10b24c26b719cefdce2c44c';
-  _api_posters = 'https://image.tmdb.org/t/p/w500';
+
+  api_key = '8655a10ea10b24c26b719cefdce2c44c';
+
+  api_posters = 'https://image.tmdb.org/t/p/w500';
 
   getRootHeaders = {
     method: 'GET',
     headers: {
       accept: 'application/json',
-      Authorization: this._token,
+      Authorization: this.token,
     },
   };
 
   async getResource(url, options) {
-    const res = await fetch(`${this._apiUrl}${url}`, options);
-    if (!res.ok) throw new Error(`Could not fetch ${this._apiUrl} , received ${res.status}`);
+    const res = await fetch(`${this.apiUrl}${url}`, options);
+    if (!res.ok) throw new Error(`Could not fetch ${this.apiUrl} , received ${res.status}`);
 
-    return await res.json();
+    return res.json();
   }
 
   async getAccessGuestSession() {
-    return await this.getResource(`/authentication/guest_session/new`, this.getRootHeaders);
+    return this.getResource('/authentication/guest_session/new', this.getRootHeaders);
   }
 
   async getRatedMovies(page) {
     const res = await this.getResource(
-      `/guest_session/${Cookies.get('guest_session_id')}/rated/movies?api_key=${this._api_key}&page=${page.toString()}`,
+      `/guest_session/${Cookies.get('guest_session_id')}/rated/movies?api_key=${this.api_key}&page=${page.toString()}`,
       {
         method: 'GET',
         headers: { accept: 'application/json' },
       }
     );
 
-    const movies = res.results.map(this.transformMovie);
+    const listMovies = res.results.map(this.transformMovie);
     const totalMovies = res.total_results;
 
-    return { movies, totalMovies };
+    return { listMovies, totalMovies };
   }
 
   async postAddRating(movieId, body) {
     return this.getResource(
-      `/movie/${movieId.toString()}/rating?guest_session_id=${Cookies.get('guest_session_id')}&language=en-US&api_key=${
-        this._api_key
-      }`,
+      `/movie/${movieId.toString()}/rating?guest_session_id=${Cookies.get('guest_session_id')}&language=en-US&api_key=${this.api_key}`,
       {
         method: 'POST',
         headers: { accept: 'application/json', 'Content-Type': 'application/json;charset=utf-8' },
-        body: body,
+        body,
       }
     );
   }
 
   async deleteRating(movieId) {
     return this.getResource(
-      `/movie/${movieId.toString()}/rating?guest_session_id=${Cookies.get('guest_session_id')}&api_key=${
-        this._api_key
-      }`,
+      `/movie/${movieId.toString()}/rating?guest_session_id=${Cookies.get('guest_session_id')}&api_key=${this.api_key}`,
       {
         method: 'DELETE',
         headers: { accept: 'application/json', 'Content-Type': 'application/json;charset=utf-8' },
@@ -69,28 +67,28 @@ export class SwapiService {
 
   async searchMoviesByTitle(title, page = 1) {
     const res = await this.getResource(
-      `/search/movie?language=en-US&query=${title}&page=${page}&api_key=${this._api_key}`,
+      `/search/movie?language=en-US&query=${title}&page=${page}&api_key=${this.api_key}`,
       this.getRootHeaders
     );
-    const movies = res.results.map(this.transformMovie);
+    const moviesList = res.results.map(this.transformMovie);
     const totalMovies = res.total_results;
 
-    return { movies, totalMovies };
+    return { moviesList, totalMovies };
   }
 
   async getMoviesGenre() {
-    const { genres } = await this.getResource(`/genre/movie/list?language=en-US`, this.getRootHeaders);
-    return await genres;
+    const { genres } = await this.getResource('/genre/movie/list?language=en-US', this.getRootHeaders);
+    return genres;
   }
 
   transformMovie = movie => ({
     id: movie.id,
     title: movie.title,
     overview: movie.overview,
-    release_date: movie.release_date,
-    poster_path: !movie.poster_path ? '' : `${this._api_posters}${movie.poster_path}`,
-    vote_average: movie.vote_average,
-    genre_ids: movie.genre_ids,
+    releaseDate: movie.release_date,
+    posterPath: !movie.poster_path ? '' : `${this.api_posters}${movie.poster_path}`,
+    voteAverage: movie.vote_average,
+    genreIds: movie.genre_ids,
     rating: !movie.rating ? 0 : movie.rating,
     guestSessionId: '',
     tabPane: '1',

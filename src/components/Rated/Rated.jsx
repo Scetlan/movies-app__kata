@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { SwapiService } from '../../service/swapiService';
 import CardRated from './CardRated';
+import SwapiService from '../../service/swapiService';
 import { Spin } from 'antd';
+
+import { useEffect, useState } from 'react';
 
 const api = new SwapiService();
 
-const Rated = () => {
+function Rated() {
   const [rateMovies, setRateMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const { movies } = await api.getRatedMovies(1);
-        console.log(movies);
-        setRateMovies(movies);
+        const { listMovies } = await api.getRatedMovies(1);
+        setRateMovies(listMovies);
       } catch (error) {
-        console.log(`rate: ${error}`);
+        throw new Error(error.message);
       } finally {
         setIsLoading(false);
       }
@@ -39,6 +39,6 @@ const Rated = () => {
       ))}
     </ul>
   );
-};
+}
 
 export default Rated;

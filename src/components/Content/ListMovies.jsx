@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
 import Card from './ListCard/Card';
-import { Alert, Pagination, Spin } from 'antd';
 import Search from '../Search/Search';
-import { debounce } from 'lodash';
-import { SwapiService } from '../../service/swapiService';
+import SwapiService from '../../service/swapiService';
 import formatDateMovie from '../../utils/formatDate';
+import { Alert, Pagination, Spin } from 'antd';
+import { debounce } from 'lodash';
+
+import { useState } from 'react';
 
 const api = new SwapiService();
 
-const ListMovies = ({ state }) => {
+function ListMovies({ state }) {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = useState(1);
@@ -20,20 +21,18 @@ const ListMovies = ({ state }) => {
       setLoading(true);
       if (!value) return;
       setSearchQuery(value);
-      const { movies, totalMovies } = await api.searchMoviesByTitle(value);
+      const { moviesList, totalMovies } = await api.searchMoviesByTitle(value);
       const arrGenre = await api.getMoviesGenre();
       state(arrGenre);
       setLoading(false);
       setTotalResults(totalMovies);
-      const updatedResults = movies.map(movie => {
-        return {
-          ...movie,
-          release_date: formatDateMovie(movie.release_date),
-        };
-      });
+      const updatedResults = moviesList.map(movie => ({
+        ...movie,
+        releaseDate: formatDateMovie(movie.releaseDate),
+      }));
       setMovies(updatedResults);
     } catch (error) {
-      console.log('Ошибка поиска: ' + error);
+      throw new Error(error.message);
     }
   }, 2000);
 
@@ -44,9 +43,9 @@ const ListMovies = ({ state }) => {
   const handlePageChange = async page => {
     if (current !== page) setCurrent(page);
     setLoading(true);
-    const { movies } = await api.searchMoviesByTitle(searchQuery, page);
+    const { moviesList } = await api.searchMoviesByTitle(searchQuery, page);
 
-    setMovies(movies);
+    setMovies(moviesList);
     setLoading(false);
   };
 
@@ -61,7 +60,7 @@ const ListMovies = ({ state }) => {
           <Card key={movie.id} movie={movie} />
         ))}
       </ul>
-      <div className='pagination'>
+      <div className="pagination">
         <Pagination
           className="pagination"
           total={totalResults}
@@ -86,6 +85,6 @@ const ListMovies = ({ state }) => {
       {content}
     </>
   );
-};
+}
 
 export default ListMovies;
