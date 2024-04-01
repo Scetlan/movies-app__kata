@@ -1,29 +1,18 @@
-import React, { useContext, useEffect, useState } from 'react';
-import photo from './img/noPhoto.jpg';
-import ListGenre from '../../Genre/ListGenre';
+import React, { useContext } from 'react';
+import photo from '../Content/ListCard/img/noPhoto.jpg';
+import { ContextMovies } from '../../service/ContextMovies';
+import ListGenre from '../Genre/ListGenre';
 import { Rate } from 'antd';
-import { ContextMovies } from '../../../service/ContextMovies';
-import createGenres from '../../../utils/createGenres';
-import { SwapiService } from '../../../service/swapiService';
+import createGenres from '../../utils/createGenres';
+import { SwapiService } from '../../service/swapiService';
 
 const api = new SwapiService();
 
-const Card = ({ movie }) => {
+const CardRated = ({ movie }) => {
   const { title, poster_path, release_date, overview, id, vote_average, genre_ids, rating } = movie;
   const isImg = poster_path === '';
 
   const listGenres = useContext(ContextMovies);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
 
   let genresBorderColor = '';
   if (vote_average <= 3) genresBorderColor = '#E90000';
@@ -38,16 +27,16 @@ const Card = ({ movie }) => {
     right: '8px',
     borderRadius: '100%',
     padding: '4px 5px',
-    fontSize: '12px',
+    'font-size': '12px',
     border: `2px solid ${genresBorderColor}`,
   };
 
-  const handleRating = vote_average => {
-    if (vote_average === 0) {
+  const handleRating = rate => {
+    if (rate === 0) {
       api.deleteRating(id);
       return;
     }
-    api.postAddRating(id, JSON.stringify({ value: vote_average }));
+    api.postAddRating(id, JSON.stringify({ value: rate }));
   };
 
   const createGenre = createGenres(listGenres, genre_ids);
@@ -71,6 +60,7 @@ const Card = ({ movie }) => {
         count={10}
         style={{ fontSize: 16 }}
         onChange={handleRating}
+        defaultValue={rating}
       />
     </>
   );
@@ -79,7 +69,7 @@ const Card = ({ movie }) => {
       <span className="overall-rating" style={style}>
         {String(vote_average).slice(0, 3)}
       </span>
-      <div className="block-mobile">
+      <div className='block-mobile'>
         <img className="pic" src={isImg ? photo : poster_path} alt={`${title}`} />
         <div className="description">
           <h2 className="title">{title}</h2>
@@ -95,11 +85,33 @@ const Card = ({ movie }) => {
         count={10}
         style={{ fontSize: 16 }}
         onChange={handleRating}
+        defaultValue={rating}
       />
     </>
   );
 
   return <li className="content__list-item">{window.innerWidth >= 1000 ? desktop : mobile}</li>;
+  // return (
+  //   <li className="content__list-item">
+  //     <span className="overall-rating" style={style}>
+  //       {String(vote_average).slice(0, 3)}
+  //     </span>
+  //     <img className="pic" src={isImg ? photo : poster_path} alt={`${title}`} />
+  //     <div className="description">
+  //       <h2 className="title">{title}</h2>
+  //       <p className="date">{release_date}</p>
+  //       <ListGenre arrGenres={createGenre} />
+  //       <p className="plot-movie">{overview}</p>
+  //       <Rate
+  //         allowHalf
+  //         allowClear={false}
+  //         count={10}
+  //         style={{ fontSize: 16 }}
+  //         onChange={handleRating}
+  //       />
+  //     </div>
+  //   </li>
+  // );
 };
 
-export default Card;
+export default CardRated;

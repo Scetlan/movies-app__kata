@@ -1,106 +1,48 @@
 import React, { useEffect, useState } from 'react';
-import { SwapiService } from './service/swapiService';
+import { Tabs } from 'antd';
 import ListMovies from './components/Content/ListMovies';
-import { Spin, Tabs } from 'antd';
-import Header from './components/Header/Header';
-import { debounce } from 'lodash';
-import Alert from 'antd/es/alert/Alert';
-import formatDate from './utils/formatDate';
-import { SwapiServiceProvider, SwapiServiceConsumer } from './service/ProviderMovies';
+import { SwapiService } from './service/swapiService';
+import Cookies from 'js-cookie';
+import Rated from './components/Rated/Rated';
+import { ContextMovies } from './service/ContextMovies';
+
+const api = new SwapiService();
 
 const App = () => {
-  const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [current, setCurrent] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [totalResults, setTotalResults] = useState(0);
-  const [genres, setGenre] = useState([]);
+  const getSession = Cookies.get('guest_session_id');
 
-  const swapi = new SwapiService();
+  const [listGenres, setListGenre] = useState([]);
 
   useEffect(() => {
     const fetchMovies = async () => {
-      setLoading(true);
-      if (searchQuery) {
-        const { movies, totalMovies } = await swapi.searchMoviesByTitle(searchQuery);
-        const arrGenre = await swapi.getMoviesGenre('ru');
-        setGenre(arrGenre);
-        setTotalResults(totalMovies);
-        const updatedResults = movies.map(movie => ({
-          ...movie,
-          date: formatDate(movie.date),
-        }));
-        setMovies(updatedResults);
-      } else {
-        setLoading(false);
-        setMovies([]);
+      try {
+        const session = !getSession && (await api.getAccessGuestSession());
+        session &&
+          Cookies.set('guest_session_id', session.guest_session_id, {
+            expires: 1,
+          });
+      } catch (error) {
+        console.log(error.message);
       }
-      setLoading(false);
     };
 
-    const debouncedFetch = debounce(fetchMovies, 1000);
-    debouncedFetch();
+    fetchMovies();
+  }, []);
 
-    return () => debouncedFetch.cancel();
-  }, [searchQuery]);
-
-  const handleSearch = event => {
-    setLoading(true);
-    setSearchQuery(event.target.value);
-  };
-
-  const handlePageChange = async page => {
-    console.log(page);
-    setCurrent(page);
-    setLoading(true);
-    const { movies } = await swapi.searchMoviesByTitle(searchQuery, page);
-    setMovies(movies);
-    setLoading(false);
-  };
-
-  const spiner = loading ? (
-    <Spin className="spiner" tip="Loading" size="large" />
-  ) : (
-    <ListMovies
-      movies={movies}
-      totalPages={movies.length}
-      total={totalResults}
-      handlePageChange={handlePageChange}
-      current={current}
-    />
-  );
-  const content =
-    !loading && movies.length === 0 ? (
-      <Alert className="alert-error" message="No results found" type="success" />
-    ) : (
-      spiner
-    );
-
-  // console.log(movies.rate);
   return (
     <main className="content">
-      <Tabs
-        defaultActiveKey="1"
-        items={[
-          {
-            label: `Search`,
-            key: 1,
-            children: (
-              // <SwapiServiceProvider value={movies}>
-              <>
-                <Header onSearch={handleSearch} />
-                {content}
-              </>
-              // </SwapiServiceProvider>
-            ),
-          },
-          {
-            label: `Rated`,
-            key: 2,
-            children: `Content of tab 2`,
-          },
-        ]}
-      />
+      <header className="menu">
+        <ContextMovies.Provider value={listGenres}>
+          <Tabs defaultActiveKey="1" centered>
+            <Tabs.TabPane tab="Search" key="1">
+              <ListMovies state={setListGenre} />
+            </Tabs.TabPane>
+            <Tabs.TabPane tab="Rated" key="2" destroyInactiveTabPane>
+              <Rated />
+            </Tabs.TabPane>
+          </Tabs>
+        </ContextMovies.Provider>
+      </header>
     </main>
   );
 };
