@@ -92,27 +92,6 @@ function CardRated({ movie }) {
   );
 
   return <li className="content__list-item">{window.innerWidth >= 1000 ? desktop : mobile}</li>;
-  // return (
-  //   <li className="content__list-item">
-  //     <span className="overall-rating" style={style}>
-  //       {String(voteAverage).slice(0, 3)}
-  //     </span>
-  //     <img className="pic" src={isImg ? photo : posterPath} alt={`${title}`} />
-  //     <div className="description">
-  //       <h2 className="title">{title}</h2>
-  //       <p className="date">{releaseDate}</p>
-  //       <ListGenre arrGenres={createGenre} />
-  //       <p className="plot-movie">{overview}</p>
-  //       <Rate
-  //         allowHalf
-  //         allowClear={false}
-  //         count={10}
-  //         style={{ fontSize: 16 }}
-  //         onChange={handleRating}
-  //       />
-  //     </div>
-  //   </li>
-  // );
 }
 
 export default CardRated;

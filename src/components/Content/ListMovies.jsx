@@ -5,7 +5,7 @@ import formatDateMovie from '../../utils/formatDate';
 import { Alert, Pagination, Spin } from 'antd';
 import { debounce } from 'lodash';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const api = new SwapiService();
 
@@ -16,25 +16,35 @@ function ListMovies({ state }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [totalResults, setTotalResults] = useState(0);
 
+  useEffect(() => {
+    setCurrent(1);
+  }, [searchQuery]);
+
   const debouncedSearch = debounce(async value => {
     try {
       setLoading(true);
       if (!value) return;
       setSearchQuery(value);
-      const { moviesList, totalMovies } = await api.searchMoviesByTitle(value);
+      const { moviesList, totalMovies } = await api.searchMoviesByTitle(value, 1);
       const arrGenre = await api.getMoviesGenre();
       state(arrGenre);
       setLoading(false);
       setTotalResults(totalMovies);
-      const updatedResults = moviesList.map(movie => ({
-        ...movie,
-        releaseDate: formatDateMovie(movie.releaseDate),
-      }));
+      const updatedResults = await moviesList.map(movie => {
+        if (movie.releaseDate && !isNaN(new Date(movie.releaseDate))) {
+          return {
+            ...movie,
+            releaseDate: formatDateMovie(movie.releaseDate),
+          };
+        } else {
+          return movie;
+        }
+      });
       setMovies(updatedResults);
     } catch (error) {
       throw new Error(error.message);
     }
-  }, 2000);
+  }, 3000);
 
   const handleSearch = event => {
     debouncedSearch(event.target.value);
@@ -48,6 +58,8 @@ function ListMovies({ state }) {
     setMovies(moviesList);
     setLoading(false);
   };
+
+  console.log(movies);
 
   const spiner = loading ? (
     <div className="spiner">

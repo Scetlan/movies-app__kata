@@ -43,7 +43,7 @@ function Card({ movie }) {
     fontSize: '12px',
     border: `2px solid ${genresBorderColor}`,
   };
-
+  
   const handleRating = rate => {
     if (rate === 0) {
       api.deleteRating(id);
@@ -73,6 +73,7 @@ function Card({ movie }) {
         count={10}
         style={{ fontSize: 16 }}
         onChange={handleRating}
+        // defaultValue={3}
       />
     </>
   );

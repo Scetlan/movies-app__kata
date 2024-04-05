@@ -14,6 +14,7 @@ function Rated() {
     const fetchMovies = async () => {
       try {
         const { listMovies } = await api.getRatedMovies(1);
+        console.log(listMovies);
         setRateMovies(listMovies);
       } catch (error) {
         throw new Error(error.message);
