@@ -38,10 +38,10 @@ export default class SwapiService {
       }
     );
 
-    const listMovies = res.results.map(this.transformMovie);
+    const cookiesListMovies = res.results.map(this.transformMovie);
     const totalMovies = res.total_results;
 
-    return { listMovies, totalMovies };
+    return { cookiesListMovies, totalMovies };
   }
 
   async postAddRating(movieId, body) {

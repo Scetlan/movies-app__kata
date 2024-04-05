@@ -13,9 +13,8 @@ function Rated() {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const { listMovies } = await api.getRatedMovies(1);
-        console.log(listMovies);
-        setRateMovies(listMovies);
+        const { cookiesListMovies } = await api.getRatedMovies(1);
+        setRateMovies(cookiesListMovies);
       } catch (error) {
         throw new Error(error.message);
       } finally {

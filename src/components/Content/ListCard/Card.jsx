@@ -10,7 +10,7 @@ import { useContext, useEffect, useState } from 'react';
 const api = new SwapiService();
 
 function Card({ movie }) {
-  const { title, posterPath, releaseDate, overview, id, voteAverage, genreIds } = movie;
+  const { title, posterPath, releaseDate, overview, id, voteAverage, genreIds, rating } = movie;
   const isImg = posterPath === '';
 
   const listGenres = useContext(ContextMovies);
@@ -28,22 +28,11 @@ function Card({ movie }) {
   }, []);
 
   let genresBorderColor = '';
-  if (voteAverage <= 3) genresBorderColor = '#E90000';
-  if (voteAverage > 3 && voteAverage <= 5) genresBorderColor = '#E97E00';
-  if (voteAverage > 5 && voteAverage <= 7) genresBorderColor = '#E9D100';
-  if (voteAverage > 7) genresBorderColor = '#66E900';
+  if (voteAverage <= 3) genresBorderColor = 'genresColorRed';
+  if (voteAverage > 3 && voteAverage <= 5) genresBorderColor = 'genresColorOrange';
+  if (voteAverage > 5 && voteAverage <= 7) genresBorderColor = 'genresColorYellow';
+  if (voteAverage > 7) genresBorderColor = 'genresColorGreen';
 
-  const style = {
-    position: 'absolute',
-    display: 'flex',
-    top: '11px',
-    right: '8px',
-    borderRadius: '100%',
-    padding: '4px 5px',
-    fontSize: '12px',
-    border: `2px solid ${genresBorderColor}`,
-  };
-  
   const handleRating = rate => {
     if (rate === 0) {
       api.deleteRating(id);
@@ -56,7 +45,7 @@ function Card({ movie }) {
 
   const desktop = (
     <>
-      <span className="overall-rating" style={style}>
+      <span className={`overall-rating ${genresBorderColor}`}>
         {String(voteAverage).slice(0, 3)}
       </span>
       <img className="pic" src={isImg ? photo : posterPath} alt={`${title}`} />
@@ -73,13 +62,13 @@ function Card({ movie }) {
         count={10}
         style={{ fontSize: 16 }}
         onChange={handleRating}
-        // defaultValue={3}
+        defaultValue={rating > 0 ? rating : 0}
       />
     </>
   );
   const mobile = (
     <>
-      <span className="overall-rating" style={style}>
+      <span className="overall-rating color-rating" style={style}>
         {String(voteAverage).slice(0, 3)}
       </span>
       <div className="block-mobile">

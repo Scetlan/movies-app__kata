@@ -5,7 +5,7 @@ import createGenres from '../../utils/createGenres';
 import SwapiService from '../../service/swapiService';
 import { Rate } from 'antd';
 
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 const api = new SwapiService();
 
@@ -14,6 +14,19 @@ function CardRated({ movie }) {
   const isImg = posterPath === '';
 
   const listGenres = useContext(ContextMovies);
+
+    // eslint-disable-next-line
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+      const handleResize = () => {
+        setWindowWidth(window.innerWidth);
+      };
+      window.addEventListener('resize', handleResize);
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }, []);
 
   let genresBorderColor = '';
   if (voteAverage <= 3) genresBorderColor = '#E90000';

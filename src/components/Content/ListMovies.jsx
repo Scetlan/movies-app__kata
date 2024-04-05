@@ -9,6 +9,21 @@ import { useEffect, useState } from 'react';
 
 const api = new SwapiService();
 
+function updateMovies(moviesList, cookiesListMovies) {
+  return moviesList.map(movie => {
+    const cookiesMovies = cookiesListMovies.filter(cookieMovie => cookieMovie.id === movie.id);
+    if (movie.releaseDate && !isNaN(new Date(movie.releaseDate))) {
+      return {
+        ...movie,
+        releaseDate: formatDateMovie(movie.releaseDate),
+        rating: cookiesMovies.length > 0 ? cookiesMovies[0].rating : 0,
+      };
+    } else {
+      return movie;
+    }
+  });
+}
+
 function ListMovies({ state }) {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -25,22 +40,14 @@ function ListMovies({ state }) {
       setLoading(true);
       if (!value) return;
       setSearchQuery(value);
-      const { moviesList, totalMovies } = await api.searchMoviesByTitle(value, 1);
+      let { moviesList, totalMovies } = await api.searchMoviesByTitle(value, 1);
+      const { cookiesListMovies } = await api.getRatedMovies(1);
       const arrGenre = await api.getMoviesGenre();
       state(arrGenre);
       setLoading(false);
       setTotalResults(totalMovies);
-      const updatedResults = await moviesList.map(movie => {
-        if (movie.releaseDate && !isNaN(new Date(movie.releaseDate))) {
-          return {
-            ...movie,
-            releaseDate: formatDateMovie(movie.releaseDate),
-          };
-        } else {
-          return movie;
-        }
-      });
-      setMovies(updatedResults);
+
+      setMovies(updateMovies(moviesList, cookiesListMovies));
     } catch (error) {
       throw new Error(error.message);
     }
@@ -53,13 +60,12 @@ function ListMovies({ state }) {
   const handlePageChange = async page => {
     if (current !== page) setCurrent(page);
     setLoading(true);
-    const { moviesList } = await api.searchMoviesByTitle(searchQuery, page);
+    let { moviesList } = await api.searchMoviesByTitle(searchQuery, page);
+    const { cookiesListMovies } = await api.getRatedMovies(1);
 
-    setMovies(moviesList);
+    setMovies(updateMovies(moviesList, cookiesListMovies));
     setLoading(false);
   };
-
-  console.log(movies);
 
   const spiner = loading ? (
     <div className="spiner">
