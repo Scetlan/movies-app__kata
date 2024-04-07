@@ -9,11 +9,12 @@ import { useContext, useEffect, useState } from 'react';
 
 const api = new SwapiService();
 
-function Card({ movie }) {
+function Card({ movie, handleMoviesRating }) {
   const { title, posterPath, releaseDate, overview, id, voteAverage, genreIds, rating } = movie;
   const isImg = posterPath === '';
 
   const listGenres = useContext(ContextMovies);
+
   // eslint-disable-next-line
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
@@ -38,16 +39,14 @@ function Card({ movie }) {
       api.deleteRating(id);
       return;
     }
-    api.postAddRating(id, JSON.stringify({ value: rate }));
+    api.postAddRating(id, rate);
   };
 
   const createGenre = createGenres(listGenres, genreIds);
 
   const desktop = (
     <>
-      <span className={`overall-rating ${genresBorderColor}`}>
-        {String(voteAverage).slice(0, 3)}
-      </span>
+      <span className={`overall-rating ${genresBorderColor}`}>{String(voteAverage).slice(0, 3)}</span>
       <img className="pic" src={isImg ? photo : posterPath} alt={`${title}`} />
       <div className="description">
         <h2 className="title">{title}</h2>
@@ -61,16 +60,17 @@ function Card({ movie }) {
         allowClear={false}
         count={10}
         style={{ fontSize: 16 }}
-        onChange={handleRating}
+        onChange={e => {
+          handleMoviesRating(id, e);
+          handleRating(e);
+        }}
         defaultValue={rating > 0 ? rating : 0}
       />
     </>
   );
   const mobile = (
     <>
-      <span className="overall-rating color-rating" style={style}>
-        {String(voteAverage).slice(0, 3)}
-      </span>
+      <span className={`overall-rating ${genresBorderColor}`}>{String(voteAverage).slice(0, 3)}</span>
       <div className="block-mobile">
         <img className="pic" src={isImg ? photo : posterPath} alt={`${title}`} />
         <div className="description">
@@ -86,7 +86,11 @@ function Card({ movie }) {
         allowClear={false}
         count={10}
         style={{ fontSize: 16 }}
-        onChange={handleRating}
+        onChange={e => {
+          handleMoviesRating(id, e);
+          handleRating(e);
+        }}
+        defaultValue={rating > 0 ? rating : 0}
       />
     </>
   );

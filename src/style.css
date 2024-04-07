@@ -154,14 +154,14 @@ div.pagination {
   margin: 0 auto;
 }
 
-.overall-rating {
-  position: 'absolute';
-  display: 'flex';
-  top: '11px';
-  right: '8px';
-  border-radius: '100%';
-  padding: '4px 5px';
-  font-size: '12px';
+span.overall-rating {
+  position: absolute;
+  display: flex;
+  top: 11px;
+  right: 8px;
+  border-radius: 100%;
+  padding: 4px 5px;
+  font-size: 12px;
 }
 .genresColorRed {
   border: 2px solid #e90000;

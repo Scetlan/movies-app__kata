@@ -28,36 +28,26 @@ function CardRated({ movie }) {
       };
     }, []);
 
-  let genresBorderColor = '';
-  if (voteAverage <= 3) genresBorderColor = '#E90000';
-  if (voteAverage > 3 && voteAverage <= 5) genresBorderColor = '#E97E00';
-  if (voteAverage > 5 && voteAverage <= 7) genresBorderColor = '#E9D100';
-  if (voteAverage > 7) genresBorderColor = '#66E900';
 
-  const style = {
-    position: 'absolute',
-    display: 'flex',
-    top: '11px',
-    right: '8px',
-    borderRadius: '100%',
-    padding: '4px 5px',
-    'font-size': '12px',
-    border: `2px solid ${genresBorderColor}`,
-  };
+    let genresBorderColor = '';
+    if (voteAverage <= 3) genresBorderColor = 'genresColorRed';
+    if (voteAverage > 3 && voteAverage <= 5) genresBorderColor = 'genresColorOrange';
+    if (voteAverage > 5 && voteAverage <= 7) genresBorderColor = 'genresColorYellow';
+    if (voteAverage > 7) genresBorderColor = 'genresColorGreen';
 
   const handleRating = rate => {
     if (rate === 0) {
       api.deleteRating(id);
       return;
     }
-    api.postAddRating(id, JSON.stringify({ value: rate }));
+    api.postAddRating(id, rate);
   };
 
   const createGenre = createGenres(listGenres, genreIds);
 
   const desktop = (
     <>
-      <span className="overall-rating" style={style}>
+      <span className={`overall-rating ${genresBorderColor}`}>
         {String(voteAverage).slice(0, 3)}
       </span>
       <img className="pic" src={isImg ? photo : posterPath} alt={`${title}`} />
@@ -80,7 +70,7 @@ function CardRated({ movie }) {
   );
   const mobile = (
     <>
-      <span className="overall-rating" style={style}>
+      <span className={`overall-rating ${genresBorderColor}`}>
         {String(voteAverage).slice(0, 3)}
       </span>
       <div className="block-mobile">
