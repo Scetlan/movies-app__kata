@@ -9,11 +9,12 @@ import { useContext, useEffect, useState } from 'react';
 
 const api = new SwapiService();
 
-function Card({ movie }) {
-  const { title, posterPath, releaseDate, overview, id, voteAverage, genreIds } = movie;
+function Card({ movie, handleMoviesRating }) {
+  const { title, posterPath, releaseDate, overview, id, voteAverage, genreIds, rating } = movie;
   const isImg = posterPath === '';
 
   const listGenres = useContext(ContextMovies);
+
   // eslint-disable-next-line
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
@@ -28,37 +29,24 @@ function Card({ movie }) {
   }, []);
 
   let genresBorderColor = '';
-  if (voteAverage <= 3) genresBorderColor = '#E90000';
-  if (voteAverage > 3 && voteAverage <= 5) genresBorderColor = '#E97E00';
-  if (voteAverage > 5 && voteAverage <= 7) genresBorderColor = '#E9D100';
-  if (voteAverage > 7) genresBorderColor = '#66E900';
-
-  const style = {
-    position: 'absolute',
-    display: 'flex',
-    top: '11px',
-    right: '8px',
-    borderRadius: '100%',
-    padding: '4px 5px',
-    fontSize: '12px',
-    border: `2px solid ${genresBorderColor}`,
-  };
+  if (voteAverage <= 3) genresBorderColor = 'genresColorRed';
+  if (voteAverage > 3 && voteAverage <= 5) genresBorderColor = 'genresColorOrange';
+  if (voteAverage > 5 && voteAverage <= 7) genresBorderColor = 'genresColorYellow';
+  if (voteAverage > 7) genresBorderColor = 'genresColorGreen';
 
   const handleRating = rate => {
     if (rate === 0) {
       api.deleteRating(id);
       return;
     }
-    api.postAddRating(id, JSON.stringify({ value: rate }));
+    api.postAddRating(id, rate);
   };
 
   const createGenre = createGenres(listGenres, genreIds);
 
   const desktop = (
     <>
-      <span className="overall-rating" style={style}>
-        {String(voteAverage).slice(0, 3)}
-      </span>
+      <span className={`overall-rating ${genresBorderColor}`}>{String(voteAverage).slice(0, 3)}</span>
       <img className="pic" src={isImg ? photo : posterPath} alt={`${title}`} />
       <div className="description">
         <h2 className="title">{title}</h2>
@@ -72,15 +60,17 @@ function Card({ movie }) {
         allowClear={false}
         count={10}
         style={{ fontSize: 16 }}
-        onChange={handleRating}
+        onChange={e => {
+          handleMoviesRating(id, e);
+          handleRating(e);
+        }}
+        defaultValue={rating > 0 ? rating : 0}
       />
     </>
   );
   const mobile = (
     <>
-      <span className="overall-rating" style={style}>
-        {String(voteAverage).slice(0, 3)}
-      </span>
+      <span className={`overall-rating ${genresBorderColor}`}>{String(voteAverage).slice(0, 3)}</span>
       <div className="block-mobile">
         <img className="pic" src={isImg ? photo : posterPath} alt={`${title}`} />
         <div className="description">
@@ -96,7 +86,11 @@ function Card({ movie }) {
         allowClear={false}
         count={10}
         style={{ fontSize: 16 }}
-        onChange={handleRating}
+        onChange={e => {
+          handleMoviesRating(id, e);
+          handleRating(e);
+        }}
+        defaultValue={rating > 0 ? rating : 0}
       />
     </>
   );

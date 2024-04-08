@@ -1,10 +1,11 @@
 import Card from './ListCard/Card';
 import Search from '../Search/Search';
 import SwapiService from '../../service/swapiService';
-import formatDateMovie from '../../utils/formatDate';
 import { Alert, Pagination, Spin } from 'antd';
 import { debounce } from 'lodash';
 
+import { format, parseISO } from 'date-fns';
+import { enUS } from 'date-fns/locale';
 import { useState } from 'react';
 
 const api = new SwapiService();
@@ -16,21 +17,35 @@ function ListMovies({ state }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [totalResults, setTotalResults] = useState(0);
 
+  const [moviesRating, setMoviesRating] = useState(new Map());
+
+  const updateRatingMoviesList = listMovies => {
+    const updatedMovies = listMovies.map(movie => {
+      if (moviesRating.has(movie.id)) {
+        return { ...movie, rating: moviesRating.get(movie.id) };
+      }
+      return movie;
+    });
+    setMovies(updatedMovies);
+  };
+
   const debouncedSearch = debounce(async value => {
     try {
       setLoading(true);
+      setCurrent(1);
       if (!value) return;
       setSearchQuery(value);
-      const { moviesList, totalMovies } = await api.searchMoviesByTitle(value);
+      let { moviesList, totalMovies } = await api.searchMoviesByTitle(value, current);
       const arrGenre = await api.getMoviesGenre();
       state(arrGenre);
       setLoading(false);
       setTotalResults(totalMovies);
-      const updatedResults = moviesList.map(movie => ({
+      moviesList = moviesList.map(movie => ({
         ...movie,
-        releaseDate: formatDateMovie(movie.releaseDate),
+        releaseDate: format(parseISO(movie.releaseDate), 'MMMM d, y', { locale: enUS }),
       }));
-      setMovies(updatedResults);
+      setMovies(moviesList);
+      updateRatingMoviesList(moviesList);
     } catch (error) {
       throw new Error(error.message);
     }
@@ -43,13 +58,23 @@ function ListMovies({ state }) {
   const handlePageChange = async page => {
     if (current !== page) setCurrent(page);
     setLoading(true);
-    const { moviesList } = await api.searchMoviesByTitle(searchQuery, page);
+    let { moviesList } = await api.searchMoviesByTitle(searchQuery, page);
+    moviesList = moviesList.map(movie => ({
+      ...movie,
+      releaseDate: format(parseISO(movie.releaseDate), 'MMMM d, y', { locale: enUS }),
+    }));
 
     setMovies(moviesList);
+    updateRatingMoviesList(moviesList);
     setLoading(false);
   };
 
-  const spiner = loading ? (
+  function handleMoviesRating(id, value) {
+    setMoviesRating(new Map([...moviesRating, [id, value]]));
+    updateRatingMoviesList(movies);
+  }
+
+  const loadingMovieList = loading ? (
     <div className="spiner">
       <Spin className="spiner__component" tip="Loading..." size="large" />
     </div>
@@ -57,7 +82,7 @@ function ListMovies({ state }) {
     <>
       <ul className="content__list">
         {movies.map(movie => (
-          <Card key={movie.id} movie={movie} />
+          <Card key={movie.id} movie={movie} handleMoviesRating={handleMoviesRating} />
         ))}
       </ul>
       <div className="pagination">
@@ -76,7 +101,7 @@ function ListMovies({ state }) {
     !loading && movies.length === 0 ? (
       <Alert className="alert-error" message="No results found" type="success" />
     ) : (
-      spiner
+      loadingMovieList
     );
 
   return (

@@ -30,27 +30,33 @@ export default class SwapiService {
   }
 
   async getRatedMovies(page) {
-    const res = await this.getResource(
-      `/guest_session/${Cookies.get('guest_session_id')}/rated/movies?api_key=${this.api_key}&page=${page.toString()}`,
-      {
-        method: 'GET',
-        headers: { accept: 'application/json' },
-      }
-    );
+    const guestSessionId = Cookies.get('guest_session_id');
 
-    const listMovies = res.results.map(this.transformMovie);
-    const totalMovies = res.total_results;
+    if (guestSessionId) {
+      const listMovies = await this.getResource(
+        `/guest_session/${guestSessionId}/rated/movies?api_key=${this.api_key}&page=${page.toString()}`,
+        {
+          method: 'GET',
+          headers: { accept: 'application/json' },
+        }
+      );
 
-    return { listMovies, totalMovies };
+      const cookiesListMovies = listMovies.results ? listMovies.results.map(this.transformMovie) : [];
+      const totalMovies = listMovies.total_results ? listMovies.total_results : 0;
+      return { listMovies, cookiesListMovies, totalMovies };
+    } else {
+      return { listMovies, cookiesListMovies: [], totalMovies: 0 };
+    }
+
   }
 
-  async postAddRating(movieId, body) {
+  async postAddRating(movieId, value) {
     return this.getResource(
-      `/movie/${movieId.toString()}/rating?guest_session_id=${Cookies.get('guest_session_id')}&language=en-US&api_key=${this.api_key}`,
+      `/movie/${movieId}/rating?api_key=${this.api_key}&guest_session_id=${Cookies.get('guest_session_id')}`,
       {
         method: 'POST',
         headers: { accept: 'application/json', 'Content-Type': 'application/json;charset=utf-8' },
-        body,
+        body: JSON.stringify({ value }),
       }
     );
   }

@@ -5,7 +5,7 @@ import createGenres from '../../utils/createGenres';
 import SwapiService from '../../service/swapiService';
 import { Rate } from 'antd';
 
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
 const api = new SwapiService();
 
@@ -15,36 +15,39 @@ function CardRated({ movie }) {
 
   const listGenres = useContext(ContextMovies);
 
-  let genresBorderColor = '';
-  if (voteAverage <= 3) genresBorderColor = '#E90000';
-  if (voteAverage > 3 && voteAverage <= 5) genresBorderColor = '#E97E00';
-  if (voteAverage > 5 && voteAverage <= 7) genresBorderColor = '#E9D100';
-  if (voteAverage > 7) genresBorderColor = '#66E900';
+    // eslint-disable-next-line
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-  const style = {
-    position: 'absolute',
-    display: 'flex',
-    top: '11px',
-    right: '8px',
-    borderRadius: '100%',
-    padding: '4px 5px',
-    'font-size': '12px',
-    border: `2px solid ${genresBorderColor}`,
-  };
+    useEffect(() => {
+      const handleResize = () => {
+        setWindowWidth(window.innerWidth);
+      };
+      window.addEventListener('resize', handleResize);
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }, []);
+
+
+    let genresBorderColor = '';
+    if (voteAverage <= 3) genresBorderColor = 'genresColorRed';
+    if (voteAverage > 3 && voteAverage <= 5) genresBorderColor = 'genresColorOrange';
+    if (voteAverage > 5 && voteAverage <= 7) genresBorderColor = 'genresColorYellow';
+    if (voteAverage > 7) genresBorderColor = 'genresColorGreen';
 
   const handleRating = rate => {
     if (rate === 0) {
       api.deleteRating(id);
       return;
     }
-    api.postAddRating(id, JSON.stringify({ value: rate }));
+    api.postAddRating(id, rate);
   };
 
   const createGenre = createGenres(listGenres, genreIds);
 
   const desktop = (
     <>
-      <span className="overall-rating" style={style}>
+      <span className={`overall-rating ${genresBorderColor}`}>
         {String(voteAverage).slice(0, 3)}
       </span>
       <img className="pic" src={isImg ? photo : posterPath} alt={`${title}`} />
@@ -67,7 +70,7 @@ function CardRated({ movie }) {
   );
   const mobile = (
     <>
-      <span className="overall-rating" style={style}>
+      <span className={`overall-rating ${genresBorderColor}`}>
         {String(voteAverage).slice(0, 3)}
       </span>
       <div className="block-mobile">
@@ -92,27 +95,6 @@ function CardRated({ movie }) {
   );
 
   return <li className="content__list-item">{window.innerWidth >= 1000 ? desktop : mobile}</li>;
-  // return (
-  //   <li className="content__list-item">
-  //     <span className="overall-rating" style={style}>
-  //       {String(voteAverage).slice(0, 3)}
-  //     </span>
-  //     <img className="pic" src={isImg ? photo : posterPath} alt={`${title}`} />
-  //     <div className="description">
-  //       <h2 className="title">{title}</h2>
-  //       <p className="date">{releaseDate}</p>
-  //       <ListGenre arrGenres={createGenre} />
-  //       <p className="plot-movie">{overview}</p>
-  //       <Rate
-  //         allowHalf
-  //         allowClear={false}
-  //         count={10}
-  //         style={{ fontSize: 16 }}
-  //         onChange={handleRating}
-  //       />
-  //     </div>
-  //   </li>
-  // );
 }
 
 export default CardRated;
