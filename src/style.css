@@ -64,6 +64,7 @@ p {
 
 .content__list-item {
   position: relative;
+  min-width: 388px;
   max-width: 388px;
   min-height: 245px;
   display: flex;
