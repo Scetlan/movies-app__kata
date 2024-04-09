@@ -1,7 +1,6 @@
 import photo from './img/noPhoto.jpg';
 import ListGenre from '../../Genre/ListGenre';
 import ContextMovies from '../../../service/ContextMovies';
-import createGenres from '../../../utils/createGenres';
 import SwapiService from '../../../service/swapiService';
 import { Rate } from 'antd';
 
@@ -42,7 +41,7 @@ function Card({ movie, handleMoviesRating }) {
     api.postAddRating(id, rate);
   };
 
-  const createGenre = createGenres(listGenres, genreIds);
+  const createGenre = genreIds.map(id => ({ id: self.crypto.randomUUID(), value: listGenres.get(id) }));
 
   const desktop = (
     <>

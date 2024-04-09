@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import Cookies from 'js-cookie';
 
 export default class SwapiService {
@@ -40,14 +41,30 @@ export default class SwapiService {
           headers: { accept: 'application/json' },
         }
       );
+      const cookiesListMovies = listMovies.results.map(movie => {
+        let date = '';
+        if (movie.release_date) date = format(new Date(movie.release_date), 'MMMM dd, yyyy');
 
-      const cookiesListMovies = listMovies.results ? listMovies.results.map(this.transformMovie) : [];
+        const newMovie = {
+          id: movie.id,
+          title: movie.title,
+          overview: movie.overview,
+          releaseDate: date,
+          posterPath: !movie.poster_path ? '' : `${this.api_posters}${movie.poster_path}`,
+          voteAverage: movie.vote_average,
+          genreIds: movie.genre_ids,
+          rating: !movie.rating ? 0 : movie.rating,
+          guestSessionId: '',
+        };
+
+        return newMovie;
+      });
+
       const totalMovies = listMovies.total_results ? listMovies.total_results : 0;
       return { listMovies, cookiesListMovies, totalMovies };
     } else {
       return { listMovies, cookiesListMovies: [], totalMovies: 0 };
     }
-
   }
 
   async postAddRating(movieId, value) {
@@ -76,27 +93,32 @@ export default class SwapiService {
       `/search/movie?language=en-US&query=${title}&page=${page}&api_key=${this.api_key}`,
       this.getRootHeaders
     );
-    const moviesList = res.results.map(this.transformMovie);
     const totalMovies = res.total_results;
+
+    const moviesList = res.results.map(movie => {
+      let date = '';
+      if (movie.release_date) date = format(new Date(movie.release_date), 'MMMM dd, yyyy');
+
+      const newMovie = {
+        id: movie.id,
+        title: movie.title,
+        overview: movie.overview,
+        releaseDate: date,
+        posterPath: !movie.poster_path ? '' : `${this.api_posters}${movie.poster_path}`,
+        voteAverage: movie.vote_average,
+        genreIds: movie.genre_ids,
+        rating: !movie.rating ? 0 : movie.rating,
+        guestSessionId: '',
+        tabPane: '1',
+      };
+      return newMovie;
+    });
 
     return { moviesList, totalMovies };
   }
 
   async getMoviesGenre() {
-    const { genres } = await this.getResource('/genre/movie/list?language=en-US', this.getRootHeaders);
-    return genres;
+    const getGenres = await this.getResource(`/genre/movie/list?language=en-US&api_key=${this.api_key}`, this.getRootHeaders);
+    return getGenres.genres;
   }
-
-  transformMovie = movie => ({
-    id: movie.id,
-    title: movie.title,
-    overview: movie.overview,
-    releaseDate: movie.release_date,
-    posterPath: !movie.poster_path ? '' : `${this.api_posters}${movie.poster_path}`,
-    voteAverage: movie.vote_average,
-    genreIds: movie.genre_ids,
-    rating: !movie.rating ? 0 : movie.rating,
-    guestSessionId: '',
-    tabPane: '1',
-  });
 }

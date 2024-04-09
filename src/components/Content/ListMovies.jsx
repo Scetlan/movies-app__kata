@@ -16,7 +16,6 @@ function ListMovies({ state }) {
   const [current, setCurrent] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [totalResults, setTotalResults] = useState(0);
-
   const [moviesRating, setMoviesRating] = useState(new Map());
 
   const updateRatingMoviesList = listMovies => {
@@ -29,44 +28,36 @@ function ListMovies({ state }) {
     setMovies(updatedMovies);
   };
 
-  const debouncedSearch = debounce(async value => {
+  const debouncedSearch = debounce(async (value, page) => {
     try {
       setLoading(true);
       setCurrent(1);
       if (!value) return;
       setSearchQuery(value);
-      let { moviesList, totalMovies } = await api.searchMoviesByTitle(value, current);
-      const arrGenre = await api.getMoviesGenre();
-      state(arrGenre);
+      const { moviesList, totalMovies } = await api.searchMoviesByTitle(value, page);
       setLoading(false);
       setTotalResults(totalMovies);
-      moviesList = moviesList.map(movie => ({
-        ...movie,
-        releaseDate: format(parseISO(movie.releaseDate), 'MMMM d, y', { locale: enUS }),
-      }));
       setMovies(moviesList);
       updateRatingMoviesList(moviesList);
     } catch (error) {
       throw new Error(error.message);
     }
-  }, 2000);
+  }, 1500);
 
   const handleSearch = event => {
-    debouncedSearch(event.target.value);
+    setCurrent(1);
+    debouncedSearch(event.target.value, 1);
   };
 
   const handlePageChange = async page => {
-    if (current !== page) setCurrent(page);
-    setLoading(true);
-    let { moviesList } = await api.searchMoviesByTitle(searchQuery, page);
-    moviesList = moviesList.map(movie => ({
-      ...movie,
-      releaseDate: format(parseISO(movie.releaseDate), 'MMMM d, y', { locale: enUS }),
-    }));
-
-    setMovies(moviesList);
-    updateRatingMoviesList(moviesList);
-    setLoading(false);
+    if (current !== page) {
+      setCurrent(page);
+      setLoading(true);
+      const { moviesList } = await api.searchMoviesByTitle(searchQuery, page);
+      setMovies(moviesList);
+      updateRatingMoviesList(moviesList);
+      setLoading(false);
+    }
   };
 
   function handleMoviesRating(id, value) {
@@ -97,6 +88,7 @@ function ListMovies({ state }) {
       </div>
     </>
   );
+
   const content =
     !loading && movies.length === 0 ? (
       <Alert className="alert-error" message="No results found" type="success" />
