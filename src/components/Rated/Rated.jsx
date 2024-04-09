@@ -3,8 +3,6 @@ import SwapiService from '../../service/swapiService';
 import { Pagination, Spin } from 'antd';
 
 import { useEffect, useState } from 'react';
-import { format, parseISO } from 'date-fns';
-import { enUS } from 'date-fns/locale';
 
 const api = new SwapiService();
 
@@ -19,11 +17,7 @@ function Rated() {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        let { cookiesListMovies } = await api.getRatedMovies(1);
-        cookiesListMovies = cookiesListMovies.map(movie => ({
-          ...movie,
-          releaseDate: format(parseISO(movie.releaseDate), 'MMMM d, y', { locale: enUS }),
-        }));
+        const { cookiesListMovies } = await api.getRatedMovies(1);
         setRateMovies(cookiesListMovies);
       } catch (error) {
         throw new Error(error.message);

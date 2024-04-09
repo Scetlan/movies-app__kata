@@ -12,7 +12,7 @@ const api = new SwapiService();
 function App() {
   const getSession = Cookies.get('guest_session_id');
 
-  const [listGenres, setListGenre] = useState([]);
+  const [listGenres, setListGenres] = useState(new Map());
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -31,13 +31,22 @@ function App() {
     fetchMovies();
   }, [getSession]);
 
+  useEffect(() => {
+    const arrGenre = async () => {
+      const genres = await api.getMoviesGenre();
+      const genresMap = new Map(genres.map(genre => [genre.id, genre.name]));
+      setListGenres(genresMap);
+    };
+    arrGenre();
+  }, []);
+
   return (
     <main className="content">
       <header className="menu">
         <ContextMovies.Provider value={listGenres}>
           <Tabs defaultActiveKey="1" centered>
             <Tabs.TabPane tab="Search" key="1">
-              <ListMovies state={setListGenre} />
+              <ListMovies />
             </Tabs.TabPane>
             <Tabs.TabPane tab="Rated" key="2" destroyInactiveTabPane>
               <Rated />
